@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * EduConnect - Configuração de Conexão com o Banco de Dados
  * 

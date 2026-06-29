@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -28,6 +29,7 @@
       <span class="font-bold text-slate-900">EduConnect</span>
     </a>
     <div class="flex items-center gap-2">
+      <a href="index.php?action=profile" class="btn-ghost text-sm">Ir para meu perfil</a>
       <a href="index.php?action=feed" class="btn-ghost text-sm">Voltar ao feed</a>
       <a href="index.php?action=logout" class="text-xs text-slate-400 hover:text-slate-700 px-2">Sair</a>
     </div>
@@ -57,34 +59,59 @@
     <p class="text-sm text-slate-500 ml-9">Mantenha suas informacoes atualizadas para que a comunidade te conheca melhor.</p>
   </div>
 
-  <!-- Preview do avatar atual -->
-  <div class="card p-6">
-    <h2 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Foto de Perfil Atual</h2>
-    <div class="flex items-center gap-5">
-      <?php if (!empty($currentUser['avatar_url'])): ?>
-        <img id="avatar-preview"
-          src="<?= htmlspecialchars($currentUser['avatar_url']) ?>"
-          class="w-20 h-20 rounded-full object-cover border-4 border-slate-200"
-          alt="Avatar atual"
-          onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($currentUser['name']) ?>&background=dbeafe&color=2563eb&size=80'">
-      <?php else: ?>
-        <div id="avatar-placeholder"
-          class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-2xl border-4 border-slate-200">
-          <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
-        </div>
-      <?php endif; ?>
-      <div>
-        <p class="text-sm font-semibold text-slate-800"><?= htmlspecialchars($currentUser['name'] ?? '') ?></p>
-        <p class="text-xs text-slate-400 mt-0.5">
-          <?= $currentUser['user_type'] === 'institution' ? 'Conta Instituicao' : 'Conta Estudante' ?>
-        </p>
-        <p class="text-xs text-blue-500 mt-2">Cole uma URL de imagem abaixo para alterar</p>
-      </div>
-    </div>
-  </div>
+  <!-- Preview do avatar atual removido -->
 
   <!-- Formulario -->
-  <form method="POST" action="index.php?action=profile_update" class="space-y-5">
+  <form method="POST" action="index.php?action=profile_update" enctype="multipart/form-data" class="space-y-5">
+
+    <!-- Preview do avatar atual -->
+    <div class="card p-6">
+      <h2 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Foto de Perfil Atual</h2>
+      <label for="avatar-file-input" class="flex items-center gap-5 cursor-pointer group">
+        <div class="relative">
+          <?php if (!empty($currentUser['avatar_url'])): ?>
+            <img id="avatar-preview"
+              src="<?= htmlspecialchars($currentUser['avatar_url']) ?>"
+              class="w-20 h-20 rounded-full object-cover border-4 border-slate-200"
+              alt="Avatar atual"
+              onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($currentUser['name']) ?>&background=dbeafe&color=2563eb&size=80'">
+          <?php else: ?>
+            <div id="avatar-placeholder"
+              class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-2xl border-4 border-slate-200">
+              <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
+            </div>
+          <?php endif; ?>
+            <input type="file" name="avatar_file" id="avatar-file-input" accept="image/*"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+            <span class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-semibold uppercase tracking-wide z-10">Alterar</span>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-slate-800"><?= htmlspecialchars($currentUser['name'] ?? '') ?></p>
+          <p class="text-xs text-slate-400 mt-0.5">
+            <?= $currentUser['user_type'] === 'institution' ? 'Conta Instituicao' : 'Conta Estudante' ?>
+          </p>
+          <p class="text-xs text-blue-500 mt-2">Clique no círculo para trocar a foto</p>
+        </div>
+      </label>
+      <div class="mt-4">
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Ou use um link direto</label>
+        <input type="url" name="avatar_url" id="avatar-url-input"
+          value="<?= htmlspecialchars($currentUser['avatar_url'] ?? '') ?>"
+          placeholder="https://exemplo.com/sua-foto.jpg"
+          oninput="previewAvatar(this.value)"
+          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 transition">
+      </div>
+
+      <!-- Preview dinamico -->
+      <div id="avatar-preview-container" class="mt-4 <?= empty($currentUser['avatar_url']) ? 'hidden' : '' ?>">
+        <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Preview</p>
+        <img id="avatar-preview-img"
+          src="<?= htmlspecialchars($currentUser['avatar_url'] ?? '') ?>"
+          class="w-16 h-16 rounded-full object-cover border-2 border-blue-200"
+          alt="Preview"
+          onerror="document.getElementById('avatar-preview-container').classList.add('hidden')">
+      </div>
+    </div>
 
     <!-- Nome -->
     <div class="card p-6">
@@ -97,6 +124,21 @@
           <input type="text" name="name" required
             value="<?= htmlspecialchars($currentUser['name'] ?? '') ?>"
             placeholder="Seu nome completo ou razao social"
+            class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">E-mail <span class="text-red-500">*</span></label>
+          <input type="email" name="email" required
+            value="<?= htmlspecialchars($currentUser['email'] ?? '') ?>"
+            placeholder="seu@email.com"
+            class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Nova senha</label>
+          <input type="password" name="password" autocomplete="new-password"
+            placeholder="Deixe em branco para manter a senha atual"
             class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 transition">
         </div>
 
@@ -126,33 +168,8 @@
       </div>
     </div>
 
-    <!-- Avatar URL -->
-    <div class="card p-6">
-      <h2 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Foto de Perfil</h2>
-      <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">URL da foto (link direto para imagem)</label>
-        <input type="url" name="avatar_url" id="avatar-url-input"
-          value="<?= htmlspecialchars($currentUser['avatar_url'] ?? '') ?>"
-          placeholder="https://exemplo.com/sua-foto.jpg"
-          oninput="previewAvatar(this.value)"
-          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 transition">
-        <p class="text-xs text-slate-400 mt-1.5">
-          Sugestao: use uma foto do <a href="https://unsplash.com" target="_blank" class="text-blue-500 hover:underline">Unsplash</a> ou o link direto da sua foto do GitHub.
-        </p>
-      </div>
+    
 
-      <!-- Preview dinamico -->
-      <div id="avatar-preview-container" class="mt-4 <?= empty($currentUser['avatar_url']) ? 'hidden' : '' ?>">
-        <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Preview</p>
-        <img id="avatar-preview-img"
-          src="<?= htmlspecialchars($currentUser['avatar_url'] ?? '') ?>"
-          class="w-16 h-16 rounded-full object-cover border-2 border-blue-200"
-          alt="Preview"
-          onerror="document.getElementById('avatar-preview-container').classList.add('hidden')">
-      </div>
-    </div>
-
-    <!-- Acoes -->
     <div class="flex items-center justify-between gap-3 pb-8">
       <a href="index.php?action=feed" class="btn-ghost">Cancelar</a>
       <button type="submit" class="btn-primary flex items-center gap-2">
@@ -164,6 +181,16 @@
     </div>
 
   </form>
+
+  <div class="card p-6 bg-amber-50 border-amber-200">
+    <h2 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Acoes da conta</h2>
+    <p class="text-sm text-slate-600 mb-4">Para excluir sua conta, a acao removerá todos os posts, likes e comentarios associados.</p>
+    <form method="POST" action="index.php?action=profile_delete" onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')">
+      <button type="submit" class="w-full text-left text-red-600 border border-red-200 hover:bg-red-50 rounded-xl px-4 py-3 text-sm font-semibold transition">
+        Excluir minha conta
+      </button>
+    </form>
+  </div>
 </main>
 
 <script>
@@ -172,13 +199,61 @@
     const img       = document.getElementById('avatar-preview-img');
 
     if (!url || url.trim() === '') {
-      container.classList.add('hidden');
+      if (container) container.classList.add('hidden');
       return;
     }
-    img.src = url;
-    img.onload  = () => container.classList.remove('hidden');
-    img.onerror = () => container.classList.add('hidden');
+    if (img) {
+      img.src = url;
+      img.onload  = () => container && container.classList.remove('hidden');
+      img.onerror = () => container && container.classList.add('hidden');
+    }
   }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('avatar-file-input');
+    const urlInput = document.getElementById('avatar-url-input');
+    const container = document.getElementById('avatar-preview-container');
+    const img = document.getElementById('avatar-preview-img');
+
+    if (fileInput) {
+      fileInput.addEventListener('change', function () {
+        const [file] = this.files || [];
+        const avatarPreview = document.getElementById('avatar-preview');
+        const avatarPlaceholder = document.getElementById('avatar-placeholder');
+
+        if (!file) {
+          if (!urlInput || urlInput.value.trim() === '') {
+            container && container.classList.add('hidden');
+          }
+          return;
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+
+        if (avatarPreview) {
+          avatarPreview.src = objectUrl;
+          avatarPreview.onload = () => {
+            container && container.classList.remove('hidden');
+            URL.revokeObjectURL(objectUrl);
+          };
+          avatarPreview.onerror = () => {
+            container && container.classList.add('hidden');
+            URL.revokeObjectURL(objectUrl);
+          };
+        } else if (avatarPlaceholder) {
+          avatarPlaceholder.classList.add('hidden');
+          const newImg = document.createElement('img');
+          newImg.id = 'avatar-preview';
+          newImg.src = objectUrl;
+          newImg.className = 'w-20 h-20 rounded-full object-cover border-4 border-slate-200';
+          newImg.alt = 'Avatar selecionado';
+          avatarPlaceholder.parentNode.insertBefore(newImg, avatarPlaceholder.nextSibling);
+          avatarPlaceholder.remove();
+          container && container.classList.remove('hidden');
+        }
+      });
+    }
+  });
 </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 require_once __DIR__ . '/../config/database.php';
 
 // ============================================================
@@ -29,8 +30,8 @@ class User
         return $stmt->fetch();
     }
 
-    /** Cria novo usuário — retorna o ID inserido ou false */
-    public function create(string $name, string $email, string $password, string $userType, string $extraInfo = ''): int|false
+    /** Cria novo usuário — retorna o ID inserido */
+    public function create(string $name, string $email, string $password, string $userType, string $extraInfo = ''): int
     {
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $this->db->prepare(
@@ -38,6 +39,37 @@ class User
         );
         $stmt->execute([$name, $email, $hash, $userType, $extraInfo]);
         return (int) $this->db->lastInsertId();
+    }
+
+    /** Atualiza as informações da conta do usuário */
+    public function updateAccount(int $id, string $name, string $email, ?string $passwordHash, string $bio, string $avatarUrl, string $extraInfo): bool
+    {
+        if ($passwordHash !== null) {
+            $stmt = $this->db->prepare(
+                'UPDATE users SET name = ?, email = ?, password_hash = ?, bio = ?, avatar_url = ?, extra_info = ? WHERE id = ?'
+            );
+            return $stmt->execute([$name, $email, $passwordHash, $bio, $avatarUrl, $extraInfo, $id]);
+        }
+
+        $stmt = $this->db->prepare(
+            'UPDATE users SET name = ?, email = ?, bio = ?, avatar_url = ?, extra_info = ? WHERE id = ?'
+        );
+        return $stmt->execute([$name, $email, $bio, $avatarUrl, $extraInfo, $id]);
+    }
+
+    /** Exclui o usuário do banco de dados */
+    public function deleteById(int $id): bool
+    {
+        $stmt = $this->db->prepare('DELETE FROM users WHERE id = ?');
+        return $stmt->execute([$id]);
+    }
+
+    /** Verifica se o e-mail pertence a outro usuário */
+    public function emailExistsForOtherUser(string $email, int $currentUserId): bool
+    {
+        $stmt = $this->db->prepare('SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1');
+        $stmt->execute([$email, $currentUserId]);
+        return (bool) $stmt->fetch();
     }
 
     /** Atualiza perfil do usuário */
@@ -55,6 +87,109 @@ class User
         $stmt = $this->db->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
         $stmt->execute([$email]);
         return (bool) $stmt->fetch();
+    }
+
+    /** Busca global por usuários e instituições usando correspondência parcial */
+    public function searchPeople(string $term): array
+    {
+        $cleanTerm = trim($term);
+        if ($cleanTerm === '') {
+            return [];
+        }
+
+        $searchTerm = '%' . strtolower($cleanTerm) . '%';
+        $sql = '
+            SELECT id, name, avatar_url, result_type
+            FROM (
+                SELECT id, name, avatar_url, "user" AS result_type
+                FROM users
+                WHERE user_type = "student"
+                  AND (
+                      LOWER(name) LIKE ?
+                      OR LOWER(email) LIKE ?
+                      OR LOWER(extra_info) LIKE ?
+                  )
+                UNION
+                SELECT id, name, avatar_url, "institution" AS result_type
+                FROM users
+                WHERE user_type = "institution"
+                  AND (
+                      LOWER(name) LIKE ?
+                      OR LOWER(email) LIKE ?
+                      OR LOWER(extra_info) LIKE ?
+                  )
+            ) AS results
+            ORDER BY name ASC
+            LIMIT 20
+        ';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+        return $stmt->fetchAll();
+    }
+}
+
+// ============================================================
+// MODEL: Follow
+// ============================================================
+class Follow
+{
+    private PDO $db;
+
+    public function __construct()
+    {
+        $this->db = Database::getConnection();
+    }
+
+    public function follow(int $followerId, int $followedId): bool
+    {
+        if ($followerId === $followedId) {
+            return false;
+        }
+
+        $stmt = $this->db->prepare('INSERT INTO seguidores (id_seguidor, id_seguido) VALUES (?, ?)');
+        return $stmt->execute([$followerId, $followedId]);
+    }
+
+    public function unfollow(int $followerId, int $followedId): bool
+    {
+        $stmt = $this->db->prepare('DELETE FROM seguidores WHERE id_seguidor = ? AND id_seguido = ?');
+        return $stmt->execute([$followerId, $followedId]);
+    }
+
+    public function isFollowing(int $followerId, int $followedId): bool
+    {
+        $stmt = $this->db->prepare('SELECT id FROM seguidores WHERE id_seguidor = ? AND id_seguido = ? LIMIT 1');
+        $stmt->execute([$followerId, $followedId]);
+        return (bool) $stmt->fetch();
+    }
+
+    public function countFollowers(int $userId): int
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM seguidores WHERE id_seguido = ?');
+        $stmt->execute([$userId]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function countFollowing(int $userId): int
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM seguidores WHERE id_seguidor = ?');
+        $stmt->execute([$userId]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function getFollowers(int $userId): array
+    {
+        $stmt = $this->db->prepare('SELECT u.id, u.name, u.avatar_url, u.user_type FROM seguidores s JOIN users u ON u.id = s.id_seguidor WHERE s.id_seguido = ? ORDER BY u.name ASC');
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
+    }
+
+    public function getFollowing(int $userId): array
+    {
+        $stmt = $this->db->prepare('SELECT u.id, u.name, u.avatar_url, u.user_type FROM seguidores s JOIN users u ON u.id = s.id_seguido WHERE s.id_seguidor = ? ORDER BY u.name ASC');
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
     }
 }
 
@@ -91,6 +226,31 @@ class Post
         ';
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':uid' => $currentUserId]);
+        return $stmt->fetchAll();
+    }
+
+    /** Retorna posts de um usuário específico */
+    public function getByUser(int $userId, int $viewerId = 0): array
+    {
+        $sql = '
+            SELECT
+                p.id,
+                p.content,
+                p.media_url,
+                p.created_at,
+                u.id        AS author_id,
+                u.name      AS author_name,
+                u.avatar_url AS author_avatar,
+                u.user_type  AS author_type,
+                (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS like_count,
+                (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id AND l.user_id = :uid) AS liked_by_me
+            FROM posts p
+            JOIN users u ON u.id = p.user_id
+            WHERE p.user_id = :user_id
+            ORDER BY p.created_at DESC
+        ';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':uid' => $viewerId, ':user_id' => $userId]);
         return $stmt->fetchAll();
     }
 
@@ -198,7 +358,7 @@ class Comment
     /** Cria comentário com filtro anti-ódio */
     public function create(int $postId, int $userId, string $content): array
     {
-        $lower = mb_strtolower($content);
+        $lower = strtolower($content);
         foreach ($this->forbidden as $word) {
             if (str_contains($lower, $word)) {
                 return ['success' => false, 'message' => 'Comentário bloqueado por conter linguagem inapropriada (RN03).'];

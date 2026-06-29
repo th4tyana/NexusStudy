@@ -9,6 +9,7 @@ USE sistema_de_chat_educacional;
 -- ============================================================
 -- TABELA: users
 -- ============================================================
+DROP TABLE IF EXISTS seguidores;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS likes;
 DROP TABLE IF EXISTS posts;
@@ -49,6 +50,19 @@ CREATE TABLE likes (
     UNIQUE KEY unique_like (post_id, user_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id)  ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- TABELA: seguidores
+-- ============================================================
+CREATE TABLE seguidores (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_seguidor INT UNSIGNED NOT NULL,
+    id_seguido INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_follow (id_seguidor, id_seguido),
+    FOREIGN KEY (id_seguidor) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_seguido) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================

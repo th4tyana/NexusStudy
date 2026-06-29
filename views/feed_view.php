@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -45,7 +46,7 @@
         </svg>
         <span class="text-[10px] font-semibold">Feed</span>
       </a>
-      <a href="index.php?action=edit_profile" class="nav-link flex flex-col items-center px-3 py-1 text-slate-500">
+      <a href="index.php?action=profile" class="nav-link flex flex-col items-center px-3 py-1 text-slate-500">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
@@ -87,6 +88,51 @@
   <!-- COL ESQUERDA: Feed -->
   <div class="space-y-5">
 
+    <!-- Busca global -->
+    <div class="card p-4">
+      <form method="GET" action="index.php?action=search_global" class="flex gap-2">
+        <div class="flex-1 relative">
+          <input type="text" id="global-search" name="q" value="<?= htmlspecialchars($searchQuery ?? '') ?>"
+            placeholder="Buscar pessoas ou instituições"
+            class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 transition">
+          <div id="search-results" class="absolute z-20 left-0 right-0 mt-1 hidden rounded-xl border border-slate-200 bg-white shadow-lg max-h-60 overflow-auto"></div>
+        </div>
+        <button type="submit" class="btn-primary">Buscar</button>
+      </form>
+
+      <?php if (!empty($searchQuery)): ?>
+        <div class="mt-3">
+          <?php if (!empty($searchResults)): ?>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Resultados</p>
+            <div class="space-y-2">
+              <?php foreach ($searchResults as $result): ?>
+                <?php $profileAction = ($result['result_type'] ?? 'user') === 'institution' ? 'institution_profile' : 'user_profile'; ?>
+                <a href="index.php?action=<?= $profileAction ?>&id=<?= (int)$result['id'] ?>"
+                  class="flex items-center gap-3 rounded-xl border border-slate-200 p-2 hover:bg-slate-50 transition">
+                  <?php if (!empty($result['avatar_url'])): ?>
+                    <img src="<?= htmlspecialchars($result['avatar_url']) ?>"
+                      class="w-10 h-10 rounded-full object-cover border border-slate-200" alt="Avatar">
+                  <?php else: ?>
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                      <?= strtoupper(substr($result['name'] ?? 'U', 0, 1)) ?>
+                    </div>
+                  <?php endif; ?>
+                  <div class="min-w-0">
+                    <div class="text-sm font-semibold text-slate-800 truncate"><?= htmlspecialchars($result['name'] ?? '') ?></div>
+                    <div class="text-xs text-slate-400">
+                      <?= ($result['result_type'] ?? 'user') === 'institution' ? 'Instituição' : 'Usuário' ?>
+                    </div>
+                  </div>
+                </a>
+              <?php endforeach; ?>
+            </div>
+          <?php else: ?>
+            <p class="text-sm text-slate-500 mt-2">Nenhum resultado encontrado para "<?= htmlspecialchars($searchQuery) ?>".</p>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
+    </div>
+
     <!-- Caixa de nova publicação -->
     <div class="card p-5">
       <div class="flex items-center gap-3 mb-3">
@@ -100,18 +146,20 @@
         <?php endif; ?>
         <button onclick="document.getElementById('new-post-form').classList.toggle('hidden')"
           class="flex-1 text-left bg-slate-100 hover:bg-slate-200 text-slate-500 text-sm rounded-full px-4 py-2.5 transition">
-          O que você quer compartilhar, <?= htmlspecialchars(explode(' ', $currentUser['name'])[0]) ?>?
+          O que você quer compartilhar, <?= htmlspecialchars((string)($currentUser['name'] ?? 'usuário')) ?>?
         </button>
       </div>
 
       <!-- Formulário expandível -->
-      <form id="new-post-form" method="POST" action="index.php?action=post_create" class="hidden border-t border-slate-100 pt-4 space-y-3">
+      <form id="new-post-form" method="POST" action="index.php?action=post_create" enctype="multipart/form-data" class="hidden border-t border-slate-100 pt-4 space-y-3">
+        <input type="hidden" name="redirect_to" value="feed">
         <textarea name="content" rows="3" placeholder="Escreva sua publicação..." required
           class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 resize-none transition"></textarea>
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">URL de imagem (opcional)</label>
-          <input type="url" name="media_url" placeholder="https://exemplo.com/imagem.jpg"
-            class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 transition">
+          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">Imagem (opcional)</label>
+          <input type="file" name="media_file" accept="image/*"
+            class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 transition" />
+          <p class="text-xs text-slate-400 mt-2">A imagem será enviada diretamente e exibida junto à publicação.</p>
         </div>
         <div class="flex justify-end gap-2">
           <button type="button" onclick="document.getElementById('new-post-form').classList.add('hidden')"
@@ -138,10 +186,16 @@
 
       <!-- Cabeçalho do post -->
       <div class="p-5 pb-3 flex items-start justify-between gap-3">
-        <div class="flex items-center gap-3">
+          <?php if ($post['author_type'] === 'institution'): ?>
+            <a href="index.php?action=institution_profile&id=<?= (int)$post['author_id'] ?>"
+              class="flex items-center gap-3 hover:text-blue-600 transition">
+          <?php else: ?>
+            <div class="flex items-center gap-3">
+          <?php endif; ?>
+
           <?php if (!empty($post['author_avatar'])): ?>
             <img src="<?= htmlspecialchars($post['author_avatar']) ?>"
-              class="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" alt="">
+              class="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" alt="Avatar do autor">
           <?php else: ?>
             <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
               <?= strtoupper(substr($post['author_name'], 0, 1)) ?>
@@ -159,7 +213,12 @@
             </div>
             <span class="text-xs text-slate-400"><?= $postTime ?></span>
           </div>
-        </div>
+
+          <?php if ($post['author_type'] === 'institution'): ?>
+            </a>
+          <?php else: ?>
+            </div>
+          <?php endif; ?>
 
         <!-- Ações (editar / excluir) -->
         <?php if ($canEdit): ?>
@@ -343,17 +402,19 @@
       <h3 class="font-bold text-slate-900">Editar publicacao</h3>
       <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
     </div>
-    <form method="POST" action="index.php?action=post_update" class="space-y-4">
+    <form method="POST" action="index.php?action=post_update" enctype="multipart/form-data" class="space-y-4">
       <input type="hidden" name="post_id" id="edit-post-id">
+      <input type="hidden" name="existing_media_url" id="edit-existing-media" value="">
       <div>
         <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Conteudo</label>
         <textarea name="content" id="edit-content" rows="5" required
           class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 resize-none transition"></textarea>
       </div>
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">URL de imagem (opcional)</label>
-        <input type="url" name="media_url" id="edit-media"
-          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 transition">
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Substituir imagem (opcional)</label>
+        <input type="file" name="media_file" id="edit-media" accept="image/*"
+          class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 transition" />
+        <p class="text-xs text-slate-400 mt-2">Envie uma nova imagem para atualizar esta publicação.</p>
       </div>
       <div class="flex gap-2 justify-end pt-1">
         <button type="button" onclick="closeEditModal()" class="btn-ghost">Cancelar</button>
@@ -386,9 +447,10 @@
 <script>
   // ----- Modais -----
   function openEditModal(id, content, mediaUrl) {
-    document.getElementById('edit-post-id').value  = id;
-    document.getElementById('edit-content').value  = content;
-    document.getElementById('edit-media').value    = mediaUrl || '';
+    document.getElementById('edit-post-id').value       = id;
+    document.getElementById('edit-content').value       = content;
+    document.getElementById('edit-existing-media').value = mediaUrl || '';
+    document.getElementById('edit-media').value          = '';
     document.getElementById('modal-edit').classList.remove('hidden');
   }
   function closeEditModal() {
@@ -436,6 +498,46 @@
     const f = document.getElementById('flash-msg');
     if (f) f.remove();
   }, 4000);
+</script>
+<script>
+  const searchInput = document.getElementById('global-search');
+  const searchResults = document.getElementById('search-results');
+
+  if (searchInput && searchResults) {
+    searchInput.addEventListener('input', function () {
+      const term = this.value.trim();
+      if (term.length < 2) {
+        searchResults.innerHTML = '';
+        searchResults.classList.add('hidden');
+        return;
+      }
+
+      fetch('index.php?action=search_autocomplete&q=' + encodeURIComponent(term))
+        .then(response => response.json())
+        .then(data => {
+          if (!data.length) {
+            searchResults.innerHTML = '<div class="p-3 text-sm text-slate-500">Nenhum resultado.</div>';
+            searchResults.classList.remove('hidden');
+            return;
+          }
+
+          searchResults.innerHTML = data.map(item => {
+            const profileAction = item.result_type === 'institution' ? 'institution_profile' : 'user_profile';
+            const avatar = item.avatar_url
+              ? `<img src="${item.avatar_url}" class="w-9 h-9 rounded-full object-cover" alt="Avatar">`
+              : `<div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">${(item.name || 'U').charAt(0).toUpperCase()}</div>`;
+            return `<a href="index.php?action=${profileAction}&id=${item.id}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50">${avatar}<span class="text-sm text-slate-700">${item.name}</span></a>`;
+          }).join('');
+          searchResults.classList.remove('hidden');
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+  }
 </script>
 </body>
 </html>
