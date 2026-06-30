@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduConnect — Perfil da Instituição</title>
+<title>ALTI — Perfil da Instituição</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; }
@@ -23,7 +23,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 3.866-4.03 7-9 7s-9-3.134-9-7c0-.539.078-1.06.227-1.562L12 14z"/>
       </svg>
-      <span class="font-bold text-slate-900 hidden sm:inline">EduConnect</span>
+      <span class="font-bold text-slate-900 hidden sm:inline">ALTI</span>
     </a>
     <div class="flex items-center gap-2">
       <a href="index.php?action=feed" class="btn-ghost text-sm">Feed</a>
