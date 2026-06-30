@@ -1,4 +1,4 @@
--- EduConnect - Schema SQL
+-- ALTI - Schema SQL
 -- Execute este arquivo no phpMyAdmin (aba SQL) ou via terminal:
 --   mysql -u root -p < schema.sql
 -- Compativel com MySQL 5.7+ / MariaDB 10.3+
@@ -91,7 +91,7 @@ INSERT INTO users (name, email, password_hash, user_type, bio, avatar_url, extra
     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
     'institution',
     'Referencia em educacao profissional e tecnologica. Formando os profissionais do futuro para a industria catarinense.',
-    'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=150&q=80',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqR5rRDUTBob9eLTsnowntJnun3lt_P7vohuyOCoM4zg&s=10',
     '03.774.819/0001-02'
 ),
 (
