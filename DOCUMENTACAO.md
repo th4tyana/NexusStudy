@@ -60,7 +60,7 @@ Abaixo está o mapeamento funcional de cada componente do sistema:
 
 ##  4. REGRAS DE NEGÓCIO E SEGURANÇA IMPLEMENTADAS
 
-O NEXUSSTUDY implementa camadas de defesa para garantir a integridade dos dados e a privacidade dos usuários.
+O ALTI implementa camadas de defesa para garantir a integridade dos dados e a privacidade dos usuários.
 
 ###  Autenticação e Sessão
 - **Hashing de Senhas:** Utilização de `password_hash()` com algoritmo BCRYPT, impedindo a exposição de senhas em texto plano no banco de dados.
