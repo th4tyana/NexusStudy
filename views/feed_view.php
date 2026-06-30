@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduConnect — Feed</title>
+<title>ALTI — Feed</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; }
@@ -35,7 +35,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 3.866-4.03 7-9 7s-9-3.134-9-7c0-.539.078-1.06.227-1.562L12 14z"/>
       </svg>
-      <span class="font-bold text-slate-900 hidden sm:inline">EduConnect</span>
+      <span class="font-bold text-slate-900 hidden sm:inline">ALTI</span>
     </a>
 
     <!-- Nav -->
@@ -360,7 +360,7 @@
         <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
         </svg>
-        <span class="font-bold text-amber-800 text-sm">EduConnect Premium</span>
+        <span class="font-bold text-amber-800 text-sm">ALTI - ADVANCED PREMIUM</span>
       </div>
       <p class="text-xs text-amber-700 leading-relaxed mb-3">
         Destaque suas publicações para estudantes de toda a plataforma e amplie o alcance da sua instituição.
@@ -388,7 +388,7 @@
 
     <!-- Rodapé -->
     <p class="text-xs text-slate-400 text-center px-2">
-      EduConnect &copy; <?= date('Y') ?><br>
+      ALTI <?= date('Y') ?><br>
       Projeto Academico — Arquitetura MVC + PHP
     </p>
   </aside>
@@ -432,7 +432,7 @@
         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
       </svg>
     </div>
-    <h3 class="font-bold text-slate-900 text-lg mb-2">EduConnect Premium</h3>
+    <h3 class="font-bold text-slate-900 text-lg mb-2">ALTI ADV - Premium</h3>
     <p class="text-slate-500 text-sm mb-6 leading-relaxed">
       Este recurso ainda nao esta disponivel.<br>
       Em breve, instituicoes poderao adquirir pacotes de destaque para ampliar seu alcance na plataforma (RN05).
