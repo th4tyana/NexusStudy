@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduConnect — Entrar</title>
+<title>ALTI — Entrar ou Cadastrar</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -39,16 +39,66 @@
       <div class="absolute left-10 top-40 h-48 w-48 rounded-full bg-white/5 blur-3xl"></div>
       <div class="relative z-10 max-w-lg">
         <div class="flex items-center gap-3 mb-8">
-          <div class="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
-            </svg>
-          </div>
-          <span class="text-base uppercase tracking-[0.35em] text-white/80">Nexo Edu</span>
+          
+          <svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <clipPath id="squircleClip" clipPathUnits="objectBoundingBox">
+      <path d="M 0,0.5 C 0,0 0,0 0.5,0 S 1,0 1,0.5 1,1 0.5,1 0,1 0,0.5"></path>
+    </clipPath>
+  </defs>
+</svg>
+
+<div class="relative">
+  <div class="absolute inset-0 bg-black/20 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl"></div>
+
+  <div class="relative flex items-center p-2">
+    <div class="relative group flex items-center">
+      
+      <div class="absolute left-full top-1/2 -translate-y-1/2 ml-3 invisible opacity-0 scale-95 group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-xl flex flex-row gap-x-5 shadow-2xl z-50">
+        
+        <a href="https://linkedin.com/in/seu-perfil-1" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
+          Thatyana
+        </a>
+        
+        <a href="https://linkedin.com/in/seu-perfil-2" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
+          Nycolas
+        </a>
+        
+        <a href="https://linkedin.com/in/seu-perfil-3" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
+          Ana
+        </a>
+        
+        <a href="https://linkedin.com/in/seu-perfil-4" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
+          Jacke
+        </a>
+        
+      </div>
+
+      <div
+        style="clip-path: url(#squircleClip)"
+        class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-lg border border-blue-500/50 cursor-pointer transform transition-all duration-300 ease-out hover:scale-110 hover:shadow-2xl"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="h-8 w-8 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+          ></path>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+          <span class="text-base uppercase tracking-[0.35em] text-white/80"> ⬅ EQUIPE</span>
         </div>
 
-        <p class="text-xs uppercase tracking-[0.35em] text-white/70 mb-4">Rede educacional corporativa</p>
-        <h1 class="text-5xl font-extrabold leading-tight mb-6">Conecte talentos.<br>Acelere carreiras.<br><span class="text-white/80">Transforme organizações.</span></h1>
+        <p class="text-xs uppercase tracking-[0.35em] text-white/70 mb-4">ALTI</p>
+        <h1 class="text-5xl font-extrabold leading-tight mb-6">Conecte talentos.<br>Acelere carreiras.<br><span class="text-white/80">Transformando organizações.</span></h1>
         <p class="text-sm text-white/80 max-w-md">Uma plataforma onde estudantes constroem portfólios reais e instituições encontram os próximos talentos do mercado.</p>
       </div>
 
@@ -58,7 +108,7 @@
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21v-2a4 4 0 00-3-3.87" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div>
-            <p class="text-xl font-semibold">48k+</p>
+            <p class="text-xl font-semibold"></p>
             <p class="uppercase tracking-[0.25em] text-xs">Estudantes</p>
           </div>
         </div>
@@ -67,7 +117,7 @@
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21V8a2 2 0 012-2h14a2 2 0 012 2v13" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 21V11h8v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div>
-            <p class="text-xl font-semibold">1.2k</p>
+            <p class="text-xl font-semibold"></p>
             <p class="uppercase tracking-[0.25em] text-xs">Instituições</p>
           </div>
         </div>
@@ -76,7 +126,7 @@
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
           </div>
           <div>
-            <p class="text-xl font-semibold">94%</p>
+            <p class="text-xl font-semibold"></p>
             <p class="uppercase tracking-[0.25em] text-xs">Empregabilidade</p>
           </div>
         </div>
@@ -96,7 +146,7 @@
           <div class="p-8">
             <div class="mb-8">
               <h2 id="form-title" class="text-3xl font-semibold text-slate-900">Bem-vindo de volta</h2>
-              <p id="form-subtitle" class="mt-3 text-sm text-slate-500">Acesse sua conta na rede Nexo Edu.</p>
+              <p id="form-subtitle" class="mt-3 text-sm text-slate-500">Acesse sua conta na rede ALTI</p>
             </div>
 
             <?php if (!empty($error)): ?>
@@ -195,14 +245,14 @@
                 <input id="extra-input" type="text" name="extra_info" placeholder="Ex.: Técnico em Desenvolvimento de Sistemas" class="form-control w-full rounded-[32px] border border-slate-200 bg-white px-5 py-4 text-sm text-slate-900">
                 <p id="extra-help" class="mt-2 text-xs text-slate-400">Informe seu curso atual para receber ofertas de vagas e parcerias.</p>
               </div>
-              <p class="text-xs text-slate-400">Ao continuar, você aceita os Termos de Uso e a Política de Privacidade do Nexo Edu.</p>
+              <p class="text-xs text-slate-400">Ao continuar, você aceita os Termos de Uso e a Política de Privacidade de ALTI.</p>
               <button type="submit" class="w-full rounded-[36px] bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] py-4 text-sm font-semibold text-white shadow-lg shadow-blue-200/40 transition hover:brightness-110">Criar minha conta</button>
               <p class="text-center text-xs text-slate-400 pt-4">Já tem conta? <button type="button" onclick="switchTab('login')" class="text-blue-600 font-semibold">Entrar</button></p>
             </form>
           </div>
         </div>
 
-        <p class="text-center text-xs text-slate-400 mt-6">EduConnect &copy; <?= date('Y') ?> — Projeto Acadêmico</p>
+        <p class="text-center text-xs text-slate-400 mt-6">ALTI  2025 a 2026 — Projeto SA - SENAI</p>
       </div>
     </main>
   </div>
