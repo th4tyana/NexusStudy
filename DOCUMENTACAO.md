@@ -1,6 +1,6 @@
-# 📘 DOCUMENTAÇÃO TÉCNICA - NEXUSSTUDY
+#  DOCUMENTAÇÃO TÉCNICA - NEXUSSTUDY
 
-## 📌 1. VISÃO GERAL DO PROJETO
+##  1. VISÃO GERAL DO PROJETO
 
 O **ALTI** é uma plataforma de ecossistema educacional e profissional unificado, projetada para servir como ponte de conexão entre alunos e instituições de ensino. O sistema permite que estudantes divulguem seus progressos acadêmicos, criem portfólios de projetos e interajam com instituições, enquanto estas podem publicar oportunidades, eventos e gerenciar a visibilidade de suas ofertas educacionais.
 
@@ -9,7 +9,7 @@ Promover a visibilidade do talento estudantil e facilitar a comunicação direta
 
 ---
 
-## 🏗️ 2. ARQUITETURA E PADRÕES DE PROJETO
+##  2. ARQUITETURA E PADRÕES DE PROJETO
 
 A aplicação foi desenvolvida utilizando **PHP 8.1+** com foco em escalabilidade, segurança e separação de interesses.
 
@@ -29,18 +29,18 @@ O projeto adota rigorosamente o padrão MVC para garantir que a lógica de negó
 
 ---
 
-## 📁 3. ESTRUTURA DE DIRETÓRIOS E COMPONENTES
+##  3. ESTRUTURA DE DIRETÓRIOS E COMPONENTES
 
 Abaixo está o mapeamento funcional de cada componente do sistema:
 
-### 📂 Diretórios
+###  Diretórios
 - `config/`: Contém as configurações globais e a conexão com o banco de dados.
 - `controllers/`: Camada de controle que processa as requisições e decide qual View exibir.
 - `models/`: Camada de abstração de dados que interage com o MySQL.
 - `views/`: Templates de interface divididos por contexto (Autenticação, Perfil, Feed).
 - `uploads/`: Armazenamento físico de mídias (fotos de perfil e imagens de publicações).
 
-### 📄 Arquivos Principais
+###  Arquivos Principais
 | Arquivo | Função |
 | :--- | :--- |
 | `index.php` | Ponto de entrada. Gerencia o roteamento básico e instancia o `MainController`. |
@@ -58,27 +58,27 @@ Abaixo está o mapeamento funcional de cada componente do sistema:
 
 ---
 
-## 🔒 4. REGRAS DE NEGÓCIO E SEGURANÇA IMPLEMENTADAS
+##  4. REGRAS DE NEGÓCIO E SEGURANÇA IMPLEMENTADAS
 
 O NEXUSSTUDY implementa camadas de defesa para garantir a integridade dos dados e a privacidade dos usuários.
 
-### 🔑 Autenticação e Sessão
+###  Autenticação e Sessão
 - **Hashing de Senhas:** Utilização de `password_hash()` com algoritmo BCRYPT, impedindo a exposição de senhas em texto plano no banco de dados.
 - **Gestão de Sessão:** Controle rigoroso via `$_SESSION`, validando a identidade do usuário em todas as rotas protegidas através do método `requireLogin()`.
 
-### 🛡️ Prevenção contra BOLA/IDOR
+###  Prevenção contra BOLA/IDOR
 Para evitar que usuários mal-intencionados manipulem IDs via URL ou POST para editar perfis ou publicações de terceiros (vulnerabilidades de **Broken Object Level Authorization**), o sistema implementa as seguintes travas no `MainController.php`:
 
 1. **Validação de Propriedade:** No método `canModifyPost()`, o sistema verifica se o `user_id` do autor da publicação é idêntico ao `$_SESSION['user_id']` do usuário logado.
 2. **Privilégios Administrativos:** Instituições possuem permissão expandida para moderar conteúdos, mas a edição de perfis de usuários é estritamente limitada ao dono da conta.
 3. **Trava de Atualização de Perfil:** O método `profileUpdate()` não aceita um ID via GET/POST para a atualização; ele utiliza obrigatoriamente o ID recuperado da sessão segura do servidor (`$_SESSION['user_id']`), tornando impossível a alteração de outro perfil via manipulação de requisição.
 
-### 🚫 Moderação Automática
+###  Moderação Automática
 Implementação de filtro anti-ódio na classe `Comment` (Model), que bloqueia a inserção de comentários contendo termos proibidos (RN03), promovendo um ambiente educacional saudável.
 
 ---
 
-## 🛢️ 5. MODELAGEM LOGÍSTICA DE DADOS
+##  5. MODELAGEM LOGÍSTICA DE DADOS
 
 A comunicação entre a persistência e a apresentação ocorre de forma fluida através do controlador.
 
