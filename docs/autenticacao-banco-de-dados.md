@@ -9,7 +9,7 @@ Este módulo é responsável por garantir a identidade do usuário no sistema, c
 - persistência com PDO e padrão DAO;
 - tratamento de erros e exceções em camadas bem definidas.
 
-O objetivo principal é oferecer um fluxo de login seguro, escalável e compatível com a arquitetura MVC adotada pelo projeto NexusStudy/ALTI.
+O objetivo principal é oferecer um fluxo de login seguro, escalável e compatível com a arquitetura MVC adotada pelo projeto ALTI.
 
 ---
 
@@ -238,7 +238,7 @@ A seguir, um exemplo de estrutura recomendada para variáveis de ambiente:
 
 ```env
 DB_HOST=localhost
-DB_NAME=nexusstudy
+DB_NAME=alti
 DB_USER=root
 DB_PASS=
 DB_CHARSET=utf8mb4
@@ -293,4 +293,4 @@ flowchart TD
 
 ## 10. Resumo Executivo
 
-O módulo de autenticação e banco de dados do NexusStudy/ALTI oferece uma base sólida para login tradicional e OAuth com Google, mantendo uma arquitetura organizada em MVC, DAO e camadas bem separadas. A combinação entre segurança, tratamento de erros e boa estrutura modular torna o sistema mais preparado para evolução, manutenção e integração com novos provedores de identidade.
+O módulo de autenticação e banco de dados do ALTI oferece uma base sólida para login tradicional e OAuth com Google, mantendo uma arquitetura organizada em MVC, DAO e camadas bem separadas. A combinação entre segurança, tratamento de erros e boa estrutura modular torna o sistema mais preparado para evolução, manutenção e integração com novos provedores de identidade.
