@@ -27,6 +27,9 @@ A aplicação foi desenvolvida de forma nativa visando alta performance e sem de
 * **Padrão Arquitetural:** **MVC** (Model-View-Controller) rigoroso
 * **Roteamento:** **Front Controller** centralizado no `index.php`
 
+### Documentação Técnica
+- [docs/autenticacao-banco-de-dados.md](docs/autenticacao-banco-de-dados.md)
+
 ---
 
 ##  Estrutura do Projeto
@@ -36,9 +39,24 @@ NEXUSSTUDY/
 ├── config/
 │   └── database.php          # Conexão segura e padrão Singleton PDO
 ├── controllers/
-│   └── MainController.php    # Cérebro do sistema (Autenticação, Rotas e Segurança)
+│   ├── AuthController.php    # Autenticação e OAuth Google
+│   ├── MainController.php    # Front Controller/roteamento
+│   ├── PostController.php    # Gerenciamento de posts e interações
+│   ├── ProfileController.php # Perfis e edição de conta
+│   └── SearchController.php  # Busca global
 ├── models/
-│   └── Models.php            # Regras de Negócio e CRUDs (User, Post, Like, Comment)
+│   ├── User.php              # Entidade de usuário
+│   ├── Post.php              # Entidade de postagem
+│   ├── Like.php              # Entidade de like
+│   ├── Comment.php           # Entidade de comentário
+│   ├── Follow.php            # Entidade de relacionamento
+│   ├── Models.php            # Bootstrap das camadas de modelo
+│   └── DAO/                  # Camada de persistência
+│       ├── UserDAO.php
+│       ├── PostDAO.php
+│       ├── LikeDAO.php
+│       ├── CommentDAO.php
+│       └── FollowDAO.php
 ├── uploads/                  # Armazenamento de avatares e imagens dos posts
 ├── views/                    # Camada de Apresentação (Interface do Usuário)
 │   ├── auth.php              # Login e Cadastro
@@ -46,5 +64,7 @@ NEXUSSTUDY/
 │   ├── profile.php           # Perfil e Portfólio do Aluno
 │   ├── institution_profile.php # Perfil público da Instituição
 │   └── edit_profile.php      # Formulário de edição de dados
+├── docs/
+│   └── autenticacao-banco-de-dados.md
 ├── index.php                 # Ponto de entrada da aplicação (Bootstrap)
 └── schema.sql                # Script de criação do Banco de Dados

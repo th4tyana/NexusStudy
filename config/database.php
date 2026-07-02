@@ -56,8 +56,7 @@ class Database
                     // Desativa a emulação de prepared statements para maior segurança
                     PDO::ATTR_EMULATE_PREPARES   => false,
                     // Garante que a conexão utilize a codificação correta
-                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . DB_CHARSET
-                ];
+                    \Pdo\Mysql::ATTR_INIT_COMMAND => "SET NAMES " . DB_CHARSET                ];
 
                 self::$instance = new PDO($dsn, DB_USER, DB_PASS, $options);
 
