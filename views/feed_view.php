@@ -186,12 +186,8 @@
 
       <!-- Cabeçalho do post -->
       <div class="p-5 pb-3 flex items-start justify-between gap-3">
-          <?php if ($post['author_type'] === 'institution'): ?>
-            <a href="index.php?action=institution_profile&id=<?= (int)$post['author_id'] ?>"
-              class="flex items-center gap-3 hover:text-blue-600 transition">
-          <?php else: ?>
-            <div class="flex items-center gap-3">
-          <?php endif; ?>
+          <a href="index.php?action=<?= $post['author_type'] === 'institution' ? 'institution_profile' : 'user_profile' ?>&id=<?= (int)$post['author_id'] ?>"
+            class="flex items-center gap-3 hover:text-blue-600 transition">
 
           <?php if (!empty($post['author_avatar'])): ?>
             <img src="<?= htmlspecialchars($post['author_avatar']) ?>"
@@ -213,12 +209,7 @@
             </div>
             <span class="text-xs text-slate-400"><?= $postTime ?></span>
           </div>
-
-          <?php if ($post['author_type'] === 'institution'): ?>
-            </a>
-          <?php else: ?>
-            </div>
-          <?php endif; ?>
+          </a>
 
         <!-- Ações (editar / excluir) -->
         <?php if ($canEdit): ?>
