@@ -20,6 +20,7 @@
 </style>
 </head>
 <body>
+<?php $isOwnProfile = (int)($_SESSION['user_id'] ?? 0) === (int)($currentUser['id'] ?? 0); ?>
 <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
   <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
     <a href="index.php?action=feed" class="flex items-center gap-2 flex-shrink-0">
@@ -30,7 +31,9 @@
       <span class="font-bold text-slate-900 hidden sm:inline">ALTI</span>
     </a>
     <div class="flex items-center gap-2">
-      <a href="index.php?action=edit_profile" class="btn-ghost text-sm">Editar perfil</a>
+      <?php if ($isOwnProfile): ?>
+        <a href="index.php?action=edit_profile" class="btn-ghost text-sm">Editar perfil</a>
+      <?php endif; ?>
       <a href="index.php?action=feed" class="btn-ghost text-sm">Feed</a>
       <a href="index.php?action=logout" class="text-xs text-slate-400 hover:text-slate-700 px-2">Sair</a>
     </div>
@@ -99,33 +102,37 @@
   <section class="space-y-4">
     <div class="flex items-center justify-between gap-4">
       <div>
-        <h2 class="text-xl font-bold text-slate-900">Suas Publicações</h2>
-        <p class="text-sm text-slate-500">Acompanhe apenas as postagens feitas por você.</p>
+        <h2 class="text-xl font-bold text-slate-900"><?= $isOwnProfile ? 'Suas Publicações' : 'Publicações' ?></h2>
+        <p class="text-sm text-slate-500"><?= $isOwnProfile ? 'Acompanhe apenas as postagens feitas por você.' : 'Publicações deste usuário.' ?></p>
       </div>
-      <button type="button" onclick="toggleNewPostForm()" class="btn-primary" id="new-post-button">
-        Nova publicação
-      </button>
+      <?php if ($isOwnProfile): ?>
+        <button type="button" onclick="toggleNewPostForm()" class="btn-primary" id="new-post-button">
+          Nova publicação
+        </button>
+      <?php endif; ?>
     </div>
 
-    <form id="new-post-form" method="POST" action="index.php?action=post_create" enctype="multipart/form-data" class="hidden card border-slate-200 p-5 space-y-3">
-      <input type="hidden" name="redirect_to" value="profile">
-      <div class="flex items-start gap-3">
-        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
-          <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
-        </div>
-        <div class="flex-1 space-y-3">
-          <textarea name="content" rows="4" required placeholder="O que você quer compartilhar hoje?"
-            class="w-full border border-slate-200 rounded-2xl p-4 text-sm bg-slate-50 resize-none transition"></textarea>
-          <input type="file" name="media_file" accept="image/*"
-            class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 transition" />
-          <p class="text-xs text-slate-400 mt-2">A imagem será enviada diretamente e exibida junto à publicação.</p>
-          <div class="flex justify-between items-center gap-3">
-            <button type="button" onclick="toggleNewPostForm()" class="btn-ghost">Cancelar</button>
-            <button type="submit" class="btn-primary">Publicar</button>
+    <?php if ($isOwnProfile): ?>
+      <form id="new-post-form" method="POST" action="index.php?action=post_create" enctype="multipart/form-data" class="hidden card border-slate-200 p-5 space-y-3">
+        <input type="hidden" name="redirect_to" value="profile">
+        <div class="flex items-start gap-3">
+          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+            <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
+          </div>
+          <div class="flex-1 space-y-3">
+            <textarea name="content" rows="4" required placeholder="O que você quer compartilhar hoje?"
+              class="w-full border border-slate-200 rounded-2xl p-4 text-sm bg-slate-50 resize-none transition"></textarea>
+            <input type="file" name="media_file" accept="image/*"
+              class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 transition" />
+            <p class="text-xs text-slate-400 mt-2">A imagem será enviada diretamente e exibida junto à publicação.</p>
+            <div class="flex justify-between items-center gap-3">
+              <button type="button" onclick="toggleNewPostForm()" class="btn-ghost">Cancelar</button>
+              <button type="submit" class="btn-primary">Publicar</button>
+            </div>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
+    <?php endif; ?>
 
     <?php if (empty($posts)): ?>
       <div class="card p-8 text-center text-slate-400 text-sm">
