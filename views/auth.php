@@ -60,7 +60,7 @@
           Thatyana
         </a>
         
-        <a href="https://linkedin.com/in/seu-perfil-2" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
+        <a href="https://www.linkedin.com/in/nycolas-g-31a2a53b2/" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
           Nycolas
         </a>
         
