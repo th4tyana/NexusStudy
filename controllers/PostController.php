@@ -249,7 +249,7 @@ class PostController
     {
         $uid  = (int) ($_SESSION['user_id']   ?? 0);
         $type = $_SESSION['user_type'] ?? '';
-        return ($post['user_id'] == $uid) || ($type === 'institution');
+        return ($post['user_id'] == $uid) && ($type === 'institution');
     }
 
     private function hydratePostsWithComments(array $posts, int $viewerId = 0): array
