@@ -278,7 +278,7 @@
         tReg.classList.add('inactive');
         tReg.classList.remove('active');
         title.textContent = 'Bem-vindo de volta';
-        subtitle.textContent = 'Acesse sua conta na rede Nexo Edu.';
+        subtitle.textContent = 'Acesse sua conta na rede ALTI.';
       } else {
         fLogin.classList.add('hidden');
         fReg.classList.remove('hidden');
