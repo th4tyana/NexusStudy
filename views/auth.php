@@ -56,7 +56,7 @@
       
       <div class="absolute left-full top-1/2 -translate-y-1/2 ml-3 invisible opacity-0 scale-95 group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-xl flex flex-row gap-x-5 shadow-2xl z-50">
         
-        <a href="https://linkedin.com/in/seu-perfil-1" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
+        <a href="https://www.linkedin.com/in/thatyalexandrefreitas/" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
           Thatyana
         </a>
         
@@ -68,8 +68,8 @@
           Ana
         </a>
         
-        <a href="https://linkedin.com/in/seu-perfil-4" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
-          Jacke
+        <a href="https://www.linkedin.com/in/jackellyne-caviquioli-ribeiro-90a285334?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" class="text-sm font-medium text-gray-300 hover:text-white pb-0.5 border-b-2 border-transparent hover:border-blue-400 transition-all duration-200 whitespace-nowrap">
+          Jackellyne
         </a>
         
       </div>
