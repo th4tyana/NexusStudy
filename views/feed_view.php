@@ -179,7 +179,7 @@
     <?php foreach ($posts as $post):
       $isAuthor  = ((int)$post['author_id'] === (int)($_SESSION['user_id'] ?? 0));
       $isInst    = ($_SESSION['user_type'] ?? '') === 'institution';
-      $canEdit   = $isAuthor || $isInst;
+      $canEdit   = $isAuthor;
       $postTime  = date('d/m/Y H:i', strtotime($post['created_at']));
     ?>
     <div class="card overflow-hidden" id="post-<?= $post['id'] ?>">
@@ -372,7 +372,7 @@
           <span class="font-bold text-indigo-800 text-sm">Poder de Moderacao</span>
         </div>
         <p class="text-xs text-indigo-600 leading-relaxed">
-          Como instituicao, voce pode editar ou remover qualquer publicacao do feed (RN02).
+          Como instituicao, voce pode editar ou remover qualquer publicacao sua do feed (RN02).
         </p>
       </div>
     <?php endif; ?>
