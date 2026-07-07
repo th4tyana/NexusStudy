@@ -121,7 +121,7 @@ INSERT INTO posts (user_id, content, media_url) VALUES
 ),
 (
     2,
-    'Desenvolvi o meu primeiro portfolio completo focado em projetos academicos! Com o EduConnect, posso conectar os trabalhos que crio na sala de aula diretamente com o perfil da minha escola. O que acharam do design limpo?',
+    'Desenvolvi o meu primeiro portfolio completo focado em projetos academicos! Com a ALTI, posso conectar os trabalhos que crio na sala de aula diretamente com o perfil da minha escola. O que acharam do design limpo?',
     'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80'
 ),
 (
