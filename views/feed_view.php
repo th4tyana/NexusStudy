@@ -21,6 +21,34 @@
   .badge-inst { background:#eff6ff; color:#2563eb; font-size:.65rem; padding:.15rem .5rem; border-radius:99px; font-weight:700; letter-spacing:.03em; }
   .badge-verified { color:#2563eb; }
   .modal-overlay { position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:flex;align-items:center;justify-content:center; }
+
+  /* Estilos do Container do Google AdSense (Imagens) */
+  .ad-container {
+    position: relative;
+    width: 300px;
+    height: 600px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  .ad-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    pointer-events: none;
+  }
+  .ad-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .ad-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 </style>
 </head>
 <body>
@@ -73,8 +101,7 @@
 
 <!-- ========== FLASH ========== -->
 <?php if (!empty($flash)): ?>
-  <div id="flash-msg"
-    class="max-w-5xl mx-auto px-4 pt-4">
+  <div id="flash-msg" class="max-w-5xl mx-auto px-4 pt-4">
     <div class="<?= $flash['type'] === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800' ?> border rounded-xl px-4 py-3 text-sm flex items-center justify-between">
       <span><?= htmlspecialchars($flash['msg']) ?></span>
       <button onclick="document.getElementById('flash-msg').remove()" class="ml-4 text-lg leading-none opacity-50 hover:opacity-100">&times;</button>
@@ -82,8 +109,54 @@
   </div>
 <?php endif; ?>
 
-<!-- ========== LAYOUT PRINCIPAL ========== -->
-<main class="max-w-5xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+<!-- ========== ENVOLVÓRIO PARA LATERAIS DE ANÚNCIOS ========== -->
+<div class="max-w-[1480px] mx-auto px-2 flex justify-center gap-4 items-start relative">
+
+  <!-- BANNER LATERAL ESQUERDO -->
+  <aside class="hidden xl:block w-[400px] flex-shrink-0 sticky top-20 pt-6">
+    <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1 text-center font-bold">GoogleAdsense</div>
+    <div class="ad-container" id="ad-left">
+      
+      <!-- Slide 1: TIM -->
+      <div class="ad-slide active">
+        <a href="https://www.tim.com.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnLpHPncLtky8AYfgb6W2hB8TQc7X5XltktE70vlzPkA&s=10" alt="Anúncio TIM">
+        </a>
+      </div>
+
+      <!-- Slide 2: Univille -->
+      <div class="ad-slide">
+        <a href="https://www.univille.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdmw8jKMpvNOICwIaubUfzKhYWTmAz0Oh2DCjWzbuOauU5LnlqZm-NGSg&s=10" alt="Anúncio Univille">
+        </a>
+      </div>
+
+      <!-- Slide 3: SENAI -->
+      <div class="ad-slide">
+        <a href="https://www.sc.senai.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpgSin6mYKP21Dp1WihvxpTDXXhu4l5XMmuMHjxPLolp7yTP09EJkyS6k&s=10" alt="Anúncio SENAI">
+        </a>
+      </div>
+
+      <!-- Slide 4: Pichau -->
+      <div class="ad-slide">
+        <a href="https://www.pichau.com.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOviFE-DdpqlZzOMK2b20A49pV7rd6s8kcAXC4tabzyH-mBrLnmfpWnWE&s=10" alt="Anúncio Pichau">
+        </a>
+      </div>
+
+      <!-- Slide 5: Alura Cursos -->
+      <div class="ad-slide">
+        <a href="https://www.alura.com.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://inspi.com.br/wp-content/uploads/2026/05/alura-logo.jpg" alt="Anúncio Cursos de Tecnologia">
+        </a>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ========== LAYOUT PRINCIPAL ========== -->
+  <main class="flex-1 max-w-5xl py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
 
   <!-- COL ESQUERDA: Feed -->
   <div class="space-y-5">
@@ -354,7 +427,7 @@
         <span class="font-bold text-amber-800 text-sm">ALTI - ADVANCED PREMIUM</span>
       </div>
       <p class="text-xs text-amber-700 leading-relaxed mb-3">
-        Destaque suas publicações para estudantes de toda a plataforma e amplie o alcance da sua instituição.
+        Navegue sem anuncios! Consiga estaque em suas publicações para estudantes de toda a plataforma e amplie o alcance do seu perfil ou de sua instituição.
       </p>
       <button onclick="openPremiumModal()"
         class="w-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-2.5 rounded-xl transition">
@@ -369,10 +442,10 @@
           <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
-          <span class="font-bold text-indigo-800 text-sm">Poder de Moderacao</span>
+          <span class="font-bold text-indigo-800 text-sm">Poder de Moderação</span>
         </div>
         <p class="text-xs text-indigo-600 leading-relaxed">
-          Como instituicao, voce pode editar ou remover qualquer publicacao sua do feed (RN02).
+          Como instituição, você pode editar ou remover qualquer publicação sua do feed (RN02).
         </p>
       </div>
     <?php endif; ?>
@@ -380,24 +453,69 @@
     <!-- Rodapé -->
     <p class="text-xs text-slate-400 text-center px-2">
       ALTI <?= date('Y') ?><br>
-      Projeto Academico — Arquitetura MVC + PHP
+      Projeto Acadêmico — Arquitetura MVC + PHP
     </p>
   </aside>
 
-</main>
+  </main>
+
+  <!-- BANNER LATERAL DIREITO -->
+  <aside class="hidden 2xl:block w-[200px] flex-shrink-0 sticky top-20 pt-6">
+    <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1 text-center font-bold">GoogleAdsense</div>
+    <div class="ad-container" id="ad-right">
+      
+      <!-- Slide 1: Univille -->
+      <div class="ad-slide active">
+        <a href="https://www.univille.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdmw8jKMpvNOICwIaubUfzKhYWTmAz0Oh2DCjWzbuOauU5LnlqZm-NGSg&s=10" alt="Anúncio Univille">
+        </a>
+      </div>
+
+      <!-- Slide 2: TIM -->
+      <div class="ad-slide">
+        <a href="https://www.tim.com.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnLpHPncLtky8AYfgb6W2hB8TQc7X5XltktE70vlzPkA&s=10" alt="Anúncio TIM">
+        </a>
+      </div>
+
+      <!-- Slide 3: Pichau -->
+      <div class="ad-slide">
+        <a href="https://www.pichau.com.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOviFE-DdpqlZzOMK2b20A49pV7rd6s8kcAXC4tabzyH-mBrLnmfpWnWE&s=10" alt="Anúncio Pichau">
+        </a>
+      </div>
+
+      <!-- Slide 4: SENAI -->
+      <div class="ad-slide">
+        <a href="https://www.sc.senai.br" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyLPGkZs9teirhKzH8WIko6UK4-z3FQjTwOs9MtnkbVg&s=10" alt="Anúncio SENAI">
+        </a>
+      </div>
+
+      <!-- Slide 5: FIAP Cursos -->
+      <div class="ad-slide">
+        <a href="https://www.fiap.com.br/" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe8dH6zvVabPgSmpJu7wCpi5ciUMKvkM3q3RXlzA8KnnKbEVDIsTUYXL4&s=10" alt="Anúncio Cursos de Tecnologia">
+        </a>
+      </div>
+
+    </div>
+  </aside>
+
+</div>
 
 <!-- ========== MODAL: EDITAR POST ========== -->
 <div id="modal-edit" class="modal-overlay hidden" onclick="if(event.target===this) closeEditModal()">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="font-bold text-slate-900">Editar publicacao</h3>
+      <h3 class="font-bold text-slate-900">Editar publicação</h3>
       <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
     </div>
     <form method="POST" action="index.php?action=post_update" enctype="multipart/form-data" class="space-y-4">
       <input type="hidden" name="post_id" id="edit-post-id">
       <input type="hidden" name="existing_media_url" id="edit-existing-media" value="">
       <div>
-        <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Conteudo</label>
+        <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Conteúdo</label>
         <textarea name="content" id="edit-content" rows="5" required
           class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 resize-none transition"></textarea>
       </div>
@@ -409,7 +527,7 @@
       </div>
       <div class="flex gap-2 justify-end pt-1">
         <button type="button" onclick="closeEditModal()" class="btn-ghost">Cancelar</button>
-        <button type="submit" class="btn-primary">Salvar alteracoes</button>
+        <button type="submit" class="btn-primary">Salvar alterações</button>
       </div>
     </form>
   </div>
@@ -425,8 +543,8 @@
     </div>
     <h3 class="font-bold text-slate-900 text-lg mb-2">ALTI ADV - Premium</h3>
     <p class="text-slate-500 text-sm mb-6 leading-relaxed">
-      Este recurso ainda nao esta disponivel.<br>
-      Em breve, instituicoes poderao adquirir pacotes de destaque para ampliar seu alcance na plataforma (RN05).
+      Este recurso ainda não está disponível.<br>
+      Em breve, com o ALTI ADV, instituições  poderão navegar sem anuncios ou interrupções, e adquirir pacotes de destaque para ampliar seu alcance na plataforma (RN05).
     </p>
     <button onclick="closePremiumModal()"
       class="w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-3 rounded-xl text-sm transition">
@@ -436,6 +554,31 @@
 </div>
 
 <script>
+  // ----- Rotação Suave de Anúncios -----
+  function initAdRotation() {
+    const leftSlides = document.querySelectorAll('#ad-left .ad-slide');
+    const rightSlides = document.querySelectorAll('#ad-right .ad-slide');
+    
+    let leftIndex = 0;
+    let rightIndex = 0;
+
+    setInterval(() => {
+      if (leftSlides.length > 0) {
+        leftSlides[leftIndex].classList.remove('active');
+        leftIndex = (leftIndex + 1) % leftSlides.length;
+        leftSlides[leftIndex].classList.add('active');
+      }
+
+      if (rightSlides.length > 0) {
+        rightSlides[rightIndex].classList.remove('active');
+        rightIndex = (rightIndex + 1) % rightSlides.length;
+        rightSlides[rightIndex].classList.add('active');
+      }
+    }, 4000);
+  }
+
+  document.addEventListener('DOMContentLoaded', initAdRotation);
+
   // ----- Modais -----
   function openEditModal(id, content, mediaUrl) {
     document.getElementById('edit-post-id').value       = id;
