@@ -16,16 +16,16 @@
 
 declare(strict_types=1);
 
-// Iniciar sessão antes de qualquer output
+// 1. Iniciar sessão
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Autoload manual dos componentes
+// 2. Autoload manual dos componentes
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/models/Models.php';
 require_once __DIR__ . '/controllers/MainController.php';
 
-// Instanciar e despachar o controller principal
+// 3. Instanciar e despachar o controller principal
 $controller = new MainController();
 $controller->dispatch();

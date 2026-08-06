@@ -8,7 +8,12 @@ class Post
         private int $userId = 0,
         private string $content = '',
         private string $mediaUrl = '',
-        private ?string $createdAt = null
+        private ?string $createdAt = null,
+        private bool $isStudyGuide = false,
+        private string $courseName = '',
+        private string $entryType = '',
+        private string $weights = '',
+        private string $pdfUrl = ''
     ) {
     }
 
@@ -19,7 +24,12 @@ class Post
             (int) ($data['user_id'] ?? 0),
             (string) ($data['content'] ?? ''),
             (string) ($data['media_url'] ?? ''),
-            isset($data['created_at']) ? (string) $data['created_at'] : null
+            isset($data['created_at']) ? (string) $data['created_at'] : null,
+            (bool) ($data['is_study_guide'] ?? false),
+            (string) ($data['course_name'] ?? ''),
+            (string) ($data['entry_type'] ?? ''),
+            (string) ($data['weights'] ?? ''),
+            (string) ($data['pdf_url'] ?? '')
         );
     }
 
@@ -31,6 +41,11 @@ class Post
             'content' => $this->content,
             'media_url' => $this->mediaUrl,
             'created_at' => $this->createdAt,
+            'is_study_guide' => $this->isStudyGuide,
+            'course_name' => $this->courseName,
+            'entry_type' => $this->entryType,
+            'weights' => $this->weights,
+            'pdf_url' => $this->pdfUrl,
         ];
     }
 }

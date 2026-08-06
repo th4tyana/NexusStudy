@@ -65,6 +65,14 @@
       </svg>
       <span class="font-bold text-slate-900 hidden sm:inline">ALTI</span>
     </a>
+        <!-- aba de guia de bolsas -->
+        <a href="index.php?action=bolsas_guide" class="nav-link flex flex-col items-center px-3 py-1 text-slate-500 hover:text-blue-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 3.866-4.03 7-9 7s-9-3.134-9-7c0-.539.078-1.06.227-1.562L12 14z"/>
+          </svg>
+          <span class="text-[10px]">Guias & Bolsas</span>
+        </a>
 
     <!-- Nav -->
     <nav class="flex items-center gap-1">
@@ -207,39 +215,126 @@
     </div>
 
     <!-- Caixa de nova publicação -->
-    <div class="card p-5">
-      <div class="flex items-center gap-3 mb-3">
-        <?php if (!empty($currentUser['avatar_url'])): ?>
-          <img src="<?= htmlspecialchars($currentUser['avatar_url']) ?>"
-            class="w-10 h-10 rounded-full object-cover border border-slate-200" alt="">
-        <?php else: ?>
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
-            <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
+    <div class="card overflow-hidden">
+  
+      <?php if (($currentUser['user_type'] ?? '') === 'institution'): ?>
+        <!-- Menu de Abas (Visível apenas para Instituições) -->
+        <div class="flex border-b border-slate-200 bg-slate-50 text-sm font-semibold">
+          <button type="button" id="tab-btn-normal" onclick="switchPostTab('normal')" 
+            class="flex-1 py-3 px-4 text-blue-600 border-b-2 border-blue-600 transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Postagem Normal
+          </button>
+          <button type="button" id="tab-btn-guia" onclick="switchPostTab('guia')" 
+            class="flex-1 py-3 px-4 text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 3.866-4.03 7-9 7s-9-3.134-9-7c0-.539.078-1.06.227-1.562L12 14z"/>
+            </svg>
+            Guia de Estudos / Edital
+          </button>
+        </div>
+      <?php endif; ?>
+
+      <div class="p-5">
+        <!-- ABA 1: Postagem Normal -->
+        <div id="tab-content-normal">
+          <div class="flex items-center gap-3 mb-3">
+            <?php if (!empty($currentUser['avatar_url'])): ?>
+              <img src="<?= htmlspecialchars($currentUser['avatar_url']) ?>" class="w-10 h-10 rounded-full object-cover border border-slate-200" alt="">
+            <?php else: ?>
+              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
+              </div>
+            <?php endif; ?>
+            <button onclick="document.getElementById('new-post-form').classList.toggle('hidden')"
+              class="flex-1 text-left bg-slate-100 hover:bg-slate-200 text-slate-500 text-sm rounded-full px-4 py-2.5 transition">
+              O que você quer compartilhar, <?= htmlspecialchars((string)($currentUser['name'] ?? 'usuário')) ?>?
+            </button>
+          </div>
+
+          <form id="new-post-form" method="POST" action="index.php?action=post_create" enctype="multipart/form-data" class="hidden border-t border-slate-100 pt-4 space-y-3">
+            <input type="hidden" name="redirect_to" value="feed">
+            <textarea name="content" rows="3" placeholder="Escreva sua publicação..." required
+              class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 resize-none transition"></textarea>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">Imagem (opcional)</label>
+              <input type="file" name="media_file" accept="image/*"
+                class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 transition" />
+            </div>
+            <div class="flex justify-end gap-2">
+              <button type="button" onclick="document.getElementById('new-post-form').classList.add('hidden')" class="btn-ghost">Cancelar</button>
+              <button type="submit" class="btn-primary">Publicar</button>
+            </div>
+          </form>
+        </div>
+
+        <?php if (($currentUser['user_type'] ?? '') === 'institution'): ?>
+          <!-- ABA 2: Form Guia de Estudos -->
+          <div id="tab-content-guia" class="hidden">
+            <form method="POST" action="index.php?action=post_create" enctype="multipart/form-data" class="space-y-4">
+              <input type="hidden" name="is_study_guide" value="1">
+              <input type="hidden" name="redirect_to" value="feed">
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Curso Alvo</label>
+                  <input type="text" name="course_name" placeholder="Ex: Engenharia de Software" required
+                    class="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-50 transition">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Tipo de Ingresso</label>
+                  <select name="entry_type" required class="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-50 transition">
+                    <option value="Vestibular Próprio">Vestibular Próprio</option>
+                    <option value="SiSU / ENEM">SiSU / ENEM</option>
+                    <option value="Histórico Escolar">Histórico Escolar</option>
+                    <option value="Transferência">Transferência Externa</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Áreas de Maior Peso</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-slate-700">
+                  <label class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="checkbox" name="weights[]" value="Redação" class="rounded text-blue-600"> Redação
+                  </label>
+                  <label class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="checkbox" name="weights[]" value="Matemática" class="rounded text-blue-600"> Matemática
+                  </label>
+                  <label class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="checkbox" name="weights[]" value="Linguagens" class="rounded text-blue-600"> Linguagens
+                  </label>
+                  <label class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="checkbox" name="weights[]" value="Natureza" class="rounded text-blue-600"> C. Natureza
+                  </label>
+                  <label class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="checkbox" name="weights[]" value="Humanas" class="rounded text-blue-600"> C. Humanas
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Detalhamento / Resumo</label>
+                <textarea name="content" rows="3" placeholder="Descreva as orientações do edital ou do curso..." required
+                  class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 resize-none transition"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Upload do Edital (PDF)</label>
+                <input type="file" name="pdf_file" accept=".pdf" required
+                  class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 transition" />
+              </div>
+
+              <div class="flex justify-end pt-2">
+                <button type="submit" class="btn-primary">Publicar Guia de Estudos</button>
+              </div>
+            </form>
           </div>
         <?php endif; ?>
-        <button onclick="document.getElementById('new-post-form').classList.toggle('hidden')"
-          class="flex-1 text-left bg-slate-100 hover:bg-slate-200 text-slate-500 text-sm rounded-full px-4 py-2.5 transition">
-          O que você quer compartilhar, <?= htmlspecialchars((string)($currentUser['name'] ?? 'usuário')) ?>?
-        </button>
       </div>
-
-      <!-- Formulário expandível -->
-      <form id="new-post-form" method="POST" action="index.php?action=post_create" enctype="multipart/form-data" class="hidden border-t border-slate-100 pt-4 space-y-3">
-        <input type="hidden" name="redirect_to" value="feed">
-        <textarea name="content" rows="3" placeholder="Escreva sua publicação..." required
-          class="w-full border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 resize-none transition"></textarea>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wide">Imagem (opcional)</label>
-          <input type="file" name="media_file" accept="image/*"
-            class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 transition" />
-          <p class="text-xs text-slate-400 mt-2">A imagem será enviada diretamente e exibida junto à publicação.</p>
-        </div>
-        <div class="flex justify-end gap-2">
-          <button type="button" onclick="document.getElementById('new-post-form').classList.add('hidden')"
-            class="btn-ghost">Cancelar</button>
-          <button type="submit" class="btn-primary">Publicar</button>
-        </div>
-      </form>
     </div>
 
     <!-- Posts -->
@@ -250,140 +345,206 @@
     <?php endif; ?>
 
     <?php foreach ($posts as $post):
-      $isAuthor  = ((int)$post['author_id'] === (int)($_SESSION['user_id'] ?? 0));
-      $isInst    = ($_SESSION['user_type'] ?? '') === 'institution';
-      $canEdit   = $isAuthor;
-      $postTime  = date('d/m/Y H:i', strtotime($post['created_at']));
-    ?>
-    <div class="card overflow-hidden" id="post-<?= $post['id'] ?>">
+  $isAuthor  = ((int)$post['author_id'] === (int)($_SESSION['user_id'] ?? 0));
+  $canEdit   = $isAuthor;
+  $postTime  = date('d/m/Y H:i', strtotime($post['created_at']));
+  $isGuide   = !empty($post['is_study_guide']);
+?>
+<div class="card overflow-hidden <?= $isGuide ? 'border-2 border-blue-500/30 shadow-md' : '' ?>" id="post-<?= $post['id'] ?>">
 
-      <!-- Cabeçalho do post -->
-      <div class="p-5 pb-3 flex items-start justify-between gap-3">
-          <a href="index.php?action=<?= $post['author_type'] === 'institution' ? 'institution_profile' : 'user_profile' ?>&id=<?= (int)$post['author_id'] ?>"
-            class="flex items-center gap-3 hover:text-blue-600 transition">
+  <!-- Cabeçalho do post -->
+  <div class="p-5 pb-3 flex items-start justify-between gap-3">
+    <a href="index.php?action=<?= $post['author_type'] === 'institution' ? 'institution_profile' : 'user_profile' ?>&id=<?= (int)$post['author_id'] ?>"
+       class="flex items-center gap-3 hover:text-blue-600 transition">
 
-          <?php if (!empty($post['author_avatar'])): ?>
-            <img src="<?= htmlspecialchars($post['author_avatar']) ?>"
-              class="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" alt="Avatar do autor">
-          <?php else: ?>
-            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
-              <?= strtoupper(substr($post['author_name'], 0, 1)) ?>
-            </div>
+      <?php if (!empty($post['author_avatar'])): ?>
+        <img src="<?= htmlspecialchars($post['author_avatar']) ?>"
+             class="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" alt="Avatar">
+      <?php else: ?>
+        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
+          <?= strtoupper(substr($post['author_name'], 0, 1)) ?>
+        </div>
+      <?php endif; ?>
+
+      <div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="font-semibold text-slate-900 text-sm"><?= htmlspecialchars($post['author_name']) ?></span>
+          <?php if ($post['author_type'] === 'institution'): ?>
+            <span class="badge-inst">Instituição</span>
+            <svg class="w-3.5 h-3.5 badge-verified" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
           <?php endif; ?>
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-slate-900 text-sm"><?= htmlspecialchars($post['author_name']) ?></span>
-              <?php if ($post['author_type'] === 'institution'): ?>
-                <span class="badge-inst">Instituição</span>
-                <svg class="w-3.5 h-3.5 badge-verified" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-              <?php endif; ?>
-            </div>
-            <span class="text-xs text-slate-400"><?= $postTime ?></span>
-          </div>
-          </a>
+        </div>
+        <span class="text-xs text-slate-400"><?= $postTime ?></span>
+      </div>
+    </a>
 
-        <!-- Ações (editar / excluir) -->
-        <?php if ($canEdit): ?>
-          <div class="flex items-center gap-1 flex-shrink-0">
-            <button onclick="openEditModal(<?= $post['id'] ?>, <?= htmlspecialchars(json_encode($post['content'])) ?>, <?= htmlspecialchars(json_encode($post['media_url'] ?? '')) ?>)"
-              class="btn-ghost p-2 rounded-lg" title="Editar">
+    <!-- Ações (editar / excluir) -->
+    <?php if ($canEdit): ?>
+      <div class="flex items-center gap-1 flex-shrink-0">
+        <button onclick="openEditModal(<?= $post['id'] ?>, <?= htmlspecialchars(json_encode($post['content'])) ?>, <?= htmlspecialchars(json_encode($post['media_url'] ?? '')) ?>)"
+                class="btn-ghost p-2 rounded-lg" title="Editar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+        </button>
+        <a href="index.php?action=post_delete&id=<?= $post['id'] ?>"
+           onclick="return confirm('Confirma a exclusão desta publicação?')"
+           class="btn-danger p-2 rounded-lg" title="Excluir">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </a>
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <?php if ($isGuide): ?>
+    <!-- ==================== LAYOUT: GUIA DE ESTUDOS / EDITAL ==================== -->
+    <div class="px-5 pb-4">
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-4 space-y-3">
+        
+        <!-- Selo de Guia de Estudos -->
+        <div class="flex items-center justify-between">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white shadow-sm">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 3.866-4.03 7-9 7s-9-3.134-9-7c0-.539.078-1.06.227-1.562L12 14z"/>
+            </svg>
+            Guia de Estudos & Edital
+          </span>
+          <?php if (!empty($post['entry_type'])): ?>
+            <span class="text-xs font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+              <?= htmlspecialchars($post['entry_type']) ?>
+            </span>
+          <?php endif; ?>
+        </div>
+
+        <!-- Nome do Curso -->
+        <?php if (!empty($post['course_name'])): ?>
+          <h3 class="text-lg font-bold text-slate-900">
+            <?= htmlspecialchars($post['course_name']) ?>
+          </h3>
+        <?php endif; ?>
+
+        <!-- Pesos das Disciplinas -->
+        <?php 
+          $weights = is_array($post['weights'] ?? null) 
+            ? $post['weights'] 
+            : json_decode($post['weights'] ?? '[]', true);
+        ?>
+        <?php if (!empty($weights) && is_array($weights)): ?>
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Áreas de Maior Peso:</span>
+            <div class="flex flex-wrap gap-1.5">
+              <?php foreach ($weights as $w): ?>
+                <span class="text-xs bg-white text-blue-700 font-semibold px-2.5 py-1 rounded-md border border-blue-200">
+                  ⚡ <?= htmlspecialchars($w) ?>
+                </span>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        <?php endif; ?>
+
+        <!-- Descrição/Resumo -->
+        <p class="text-sm text-slate-700 leading-relaxed pt-1">
+          <?= nl2br(htmlspecialchars($post['content'])) ?>
+        </p>
+
+        <!-- Botão Baixar PDF -->
+        <?php if (!empty($post['pdf_url'])): ?>
+          <div class="pt-2">
+            <a href="<?= htmlspecialchars($post['pdf_url']) ?>" target="_blank" download
+               class="inline-flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-sm">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
-            </button>
-            <a href="index.php?action=post_delete&id=<?= $post['id'] ?>"
-              onclick="return confirm('Confirma a exclusão desta publicação?')"
-              class="btn-danger p-2 rounded-lg" title="Excluir">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-              </svg>
+              Baixar Edital / Guia Completo (PDF)
             </a>
           </div>
         <?php endif; ?>
+
       </div>
+    </div>
 
-      <!-- Conteúdo -->
-      <div class="px-5 pb-3">
-        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line"><?= nl2br(htmlspecialchars($post['content'])) ?></p>
-      </div>
+  <?php else: ?>
+    <!-- ==================== LAYOUT: POST NORMAL ==================== -->
+    <div class="px-5 pb-3">
+      <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line"><?= nl2br(htmlspecialchars($post['content'])) ?></p>
+    </div>
 
-      <!-- Mídia -->
-      <?php if (!empty($post['media_url'])): ?>
-        <img src="<?= htmlspecialchars($post['media_url']) ?>"
-          class="w-full max-h-80 object-cover" alt="Mídia da publicação"
-          onerror="this.style.display='none'">
-      <?php endif; ?>
+    <!-- Mídia Imagem -->
+    <?php if (!empty($post['media_url'])): ?>
+      <img src="<?= htmlspecialchars($post['media_url']) ?>"
+           class="w-full max-h-80 object-cover" alt="Mídia da publicação"
+           onerror="this.style.display='none'">
+    <?php endif; ?>
+  <?php endif; ?>
 
-      <!-- Contadores -->
-      <div class="px-5 py-2.5 flex items-center gap-4 text-xs text-slate-400 border-t border-slate-100">
-        <span id="like-count-<?= $post['id'] ?>"><?= $post['like_count'] ?> curtida<?= $post['like_count'] != 1 ? 's' : '' ?></span>
-        <span><?= count($post['comments']) ?> comentário<?= count($post['comments']) != 1 ? 's' : '' ?></span>
-      </div>
+  <!-- Contadores -->
+  <div class="px-5 py-2.5 flex items-center gap-4 text-xs text-slate-400 border-t border-slate-100">
+    <span id="like-count-<?= $post['id'] ?>"><?= $post['like_count'] ?> curtida<?= $post['like_count'] != 1 ? 's' : '' ?></span>
+    <span><?= count($post['comments']) ?> comentário<?= count($post['comments']) != 1 ? 's' : '' ?></span>
+  </div>
 
-      <!-- Botões de ação -->
-      <div class="px-5 py-2 flex items-center gap-1 border-t border-slate-100">
-        <button id="like-btn-<?= $post['id'] ?>"
-          onclick="toggleLike(<?= $post['id'] ?>)"
-          class="flex items-center gap-1.5 btn-ghost <?= $post['liked_by_me'] ? 'text-blue-600 font-semibold' : '' ?>">
-          <svg class="w-4 h-4" fill="<?= $post['liked_by_me'] ? 'currentColor' : 'none' ?>" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
-          </svg>
-          Curtir
-        </button>
-        <button onclick="toggleComments(<?= $post['id'] ?>)"
-          class="flex items-center gap-1.5 btn-ghost">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-          </svg>
-          Comentar
-        </button>
-      </div>
+  <!-- Botões de ação -->
+  <div class="px-5 py-2 flex items-center gap-1 border-t border-slate-100">
+    <button id="like-btn-<?= $post['id'] ?>"
+            onclick="toggleLike(<?= $post['id'] ?>)"
+            class="flex items-center gap-1.5 btn-ghost <?= $post['liked_by_me'] ? 'text-blue-600 font-semibold' : '' ?>">
+      <svg class="w-4 h-4" fill="<?= $post['liked_by_me'] ? 'currentColor' : 'none' ?>" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+      </svg>
+      Curtir
+    </button>
+    <button onclick="toggleComments(<?= $post['id'] ?>)" class="flex items-center gap-1.5 btn-ghost">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+      </svg>
+      Comentar
+    </button>
+  </div>
 
-      <!-- Seção de comentários (colapsada por padrão) -->
-      <div id="comments-<?= $post['id'] ?>" class="hidden border-t border-slate-100 bg-slate-50">
-        <!-- Comentários existentes -->
-        <div class="px-5 pt-3 space-y-3" id="comment-list-<?= $post['id'] ?>">
-          <?php foreach ($post['comments'] as $comment): ?>
-            <div class="flex gap-2.5">
-              <?php if (!empty($comment['author_avatar'])): ?>
-                <img src="<?= htmlspecialchars($comment['author_avatar']) ?>"
-                  class="w-7 h-7 rounded-full object-cover flex-shrink-0" alt="">
-              <?php else: ?>
-                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[10px] font-bold flex-shrink-0">
-                  <?= strtoupper(substr($comment['author_name'], 0, 1)) ?>
-                </div>
-              <?php endif; ?>
-              <div class="bg-white rounded-xl px-3 py-2 text-xs flex-1 border border-slate-200">
-                <span class="font-semibold text-slate-800"><?= htmlspecialchars($comment['author_name']) ?></span>
-                <p class="text-slate-600 mt-0.5"><?= nl2br(htmlspecialchars($comment['content'])) ?></p>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        </div>
-
-        <!-- Formulário novo comentário -->
-        <form method="POST" action="index.php?action=comment_create" class="px-5 py-3 flex gap-2.5 items-start">
-          <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-          <?php if (!empty($currentUser['avatar_url'])): ?>
-            <img src="<?= htmlspecialchars($currentUser['avatar_url']) ?>"
-              class="w-7 h-7 rounded-full object-cover flex-shrink-0" alt="">
+  <!-- Comentários -->
+  <div id="comments-<?= $post['id'] ?>" class="hidden border-t border-slate-100 bg-slate-50">
+    <div class="px-5 pt-3 space-y-3" id="comment-list-<?= $post['id'] ?>">
+      <?php foreach ($post['comments'] as $comment): ?>
+        <div class="flex gap-2.5">
+          <?php if (!empty($comment['author_avatar'])): ?>
+            <img src="<?= htmlspecialchars($comment['author_avatar']) ?>" class="w-7 h-7 rounded-full object-cover flex-shrink-0" alt="">
           <?php else: ?>
             <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[10px] font-bold flex-shrink-0">
-              <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
+              <?= strtoupper(substr($comment['author_name'], 0, 1)) ?>
             </div>
           <?php endif; ?>
-          <div class="flex-1 flex gap-2">
-            <input type="text" name="content" placeholder="Adicione um comentário..." required
-              class="flex-1 border border-slate-200 rounded-full px-3 py-1.5 text-xs bg-white transition">
-            <button type="submit" class="btn-primary py-1.5 px-3 text-xs">Enviar</button>
+          <div class="bg-white rounded-xl px-3 py-2 text-xs flex-1 border border-slate-200">
+            <span class="font-semibold text-slate-800"><?= htmlspecialchars($comment['author_name']) ?></span>
+            <p class="text-slate-600 mt-0.5"><?= nl2br(htmlspecialchars($comment['content'])) ?></p>
           </div>
-        </form>
-      </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
 
-    </div><!-- /post -->
-    <?php endforeach; ?>
+    <form method="POST" action="index.php?action=comment_create" class="px-5 py-3 flex gap-2.5 items-start">
+      <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
+      <?php if (!empty($currentUser['avatar_url'])): ?>
+        <img src="<?= htmlspecialchars($currentUser['avatar_url']) ?>" class="w-7 h-7 rounded-full object-cover flex-shrink-0" alt="">
+      <?php else: ?>
+        <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[10px] font-bold flex-shrink-0">
+          <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
+        </div>
+      <?php endif; ?>
+      <div class="flex-1 flex gap-2">
+        <input type="text" name="content" placeholder="Adicione um comentário..." required
+               class="flex-1 border border-slate-200 rounded-full px-3 py-1.5 text-xs bg-white transition">
+        <button type="submit" class="btn-primary py-1.5 px-3 text-xs">Enviar</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+<?php endforeach; ?>
 
   </div><!-- /col-left -->
 
@@ -544,7 +705,7 @@
     <h3 class="font-bold text-slate-900 text-lg mb-2">ALTI ADV - Premium</h3>
     <p class="text-slate-500 text-sm mb-6 leading-relaxed">
       Este recurso ainda não está disponível.<br>
-      Em breve, com o ALTI ADV, instituições  poderão navegar sem anuncios ou interrupções, e adquirir pacotes de destaque para ampliar seu alcance na plataforma (RN05).
+      Em breve, com o ALTI ADV, instituições poderão navegar sem anuncios ou interrupções, e adquirir pacotes de destaque para ampliar seu alcance na plataforma (RN05).
     </p>
     <button onclick="closePremiumModal()"
       class="w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-3 rounded-xl text-sm transition">
@@ -627,51 +788,79 @@
     }
   }
 
+  // ----- Troca de Abas do Post (Instituição) -----
+  function switchPostTab(tab) {
+    const tabNormal = document.getElementById('tab-content-normal');
+    const tabGuia = document.getElementById('tab-content-guia');
+    const btnNormal = document.getElementById('tab-btn-normal');
+    const btnGuia = document.getElementById('tab-btn-guia');
+
+    if (!tabNormal || !tabGuia) return;
+
+    if (tab === 'normal') {
+      tabNormal.classList.remove('hidden');
+      tabGuia.classList.add('hidden');
+      btnNormal.classList.add('text-blue-600', 'border-blue-600');
+      btnNormal.classList.remove('text-slate-500', 'border-transparent');
+      btnGuia.classList.add('text-slate-500', 'border-transparent');
+      btnGuia.classList.remove('text-blue-600', 'border-blue-600');
+    } else {
+      tabGuia.classList.remove('hidden');
+      tabNormal.classList.add('hidden');
+      btnGuia.classList.add('text-blue-600', 'border-blue-600');
+      btnGuia.classList.remove('text-slate-500', 'border-transparent');
+      btnNormal.classList.add('text-slate-500', 'border-transparent');
+      btnNormal.classList.remove('text-blue-600', 'border-blue-600');
+    }
+  }
+
   // ----- Auto-ocultar flash após 4s -----
   setTimeout(() => {
     const f = document.getElementById('flash-msg');
     if (f) f.remove();
   }, 4000);
-</script>
-<script>
-  const searchInput = document.getElementById('global-search');
-  const searchResults = document.getElementById('search-results');
 
-  if (searchInput && searchResults) {
-    searchInput.addEventListener('input', function () {
-      const term = this.value.trim();
-      if (term.length < 2) {
-        searchResults.innerHTML = '';
-        searchResults.classList.add('hidden');
-        return;
-      }
+  // ----- Busca com Autocomplete -----
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('global-search');
+    const searchResults = document.getElementById('search-results');
 
-      fetch('index.php?action=search_autocomplete&q=' + encodeURIComponent(term))
-        .then(response => response.json())
-        .then(data => {
-          if (!data.length) {
-            searchResults.innerHTML = '<div class="p-3 text-sm text-slate-500">Nenhum resultado.</div>';
+    if (searchInput && searchResults) {
+      searchInput.addEventListener('input', function () {
+        const term = this.value.trim();
+        if (term.length < 2) {
+          searchResults.innerHTML = '';
+          searchResults.classList.add('hidden');
+          return;
+        }
+
+        fetch('index.php?action=search_autocomplete&q=' + encodeURIComponent(term))
+          .then(response => response.json())
+          .then(data => {
+            if (!data.length) {
+              searchResults.innerHTML = '<div class="p-3 text-sm text-slate-500">Nenhum resultado.</div>';
+              searchResults.classList.remove('hidden');
+              return;
+            }
+
+            searchResults.innerHTML = data.map(item => {
+              const profileAction = item.result_type === 'institution' ? 'institution_profile' : 'user_profile';
+              const avatar = item.avatar_url
+                ? `<img src="${item.avatar_url}" class="w-9 h-9 rounded-full object-cover" alt="Avatar">`
+                : `<div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">${(item.name || 'U').charAt(0).toUpperCase()}</div>`;
+              return `<a href="index.php?action=${profileAction}&id=${item.id}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50">${avatar}<span class="text-sm text-slate-700">${item.name}</span></a>`;
+            }).join('');
             searchResults.classList.remove('hidden');
-            return;
-          }
+          });
+      });
 
-          searchResults.innerHTML = data.map(item => {
-            const profileAction = item.result_type === 'institution' ? 'institution_profile' : 'user_profile';
-            const avatar = item.avatar_url
-              ? `<img src="${item.avatar_url}" class="w-9 h-9 rounded-full object-cover" alt="Avatar">`
-              : `<div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">${(item.name || 'U').charAt(0).toUpperCase()}</div>`;
-            return `<a href="index.php?action=${profileAction}&id=${item.id}" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-50">${avatar}<span class="text-sm text-slate-700">${item.name}</span></a>`;
-          }).join('');
-          searchResults.classList.remove('hidden');
-        });
-    });
-
-    document.addEventListener('click', function (event) {
-      if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
-        searchResults.classList.add('hidden');
-      }
-    });
-  }
+      document.addEventListener('click', function (event) {
+        if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
+          searchResults.classList.add('hidden');
+        }
+      });
+    }
+  });
 </script>
 </body>
 </html>

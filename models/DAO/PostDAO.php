@@ -20,6 +20,11 @@ class PostDAO
                 p.content,
                 p.media_url,
                 p.created_at,
+                p.is_study_guide,
+                p.course_name,
+                p.entry_type,
+                p.weights,
+                p.pdf_url,
                 u.id        AS author_id,
                 u.name      AS author_name,
                 u.avatar_url AS author_avatar,
@@ -43,6 +48,11 @@ class PostDAO
                 p.content,
                 p.media_url,
                 p.created_at,
+                p.is_study_guide,
+                p.course_name,
+                p.entry_type,
+                p.weights,
+                p.pdf_url,
                 u.id        AS author_id,
                 u.name      AS author_name,
                 u.avatar_url AS author_avatar,
@@ -75,6 +85,22 @@ class PostDAO
         return (int) $this->db->lastInsertId();
     }
 
+    public function createStudyGuide(
+        int $userId, 
+        string $content, 
+        string $courseName, 
+        string $entryType, 
+        string $weightsJson, 
+        string $pdfUrl
+    ): int {
+        $stmt = $this->db->prepare(
+            'INSERT INTO posts (user_id, content, is_study_guide, course_name, entry_type, weights, pdf_url) 
+            VALUES (?, ?, 1, ?, ?, ?, ?)'
+        );
+        $stmt->execute([$userId, $content, $courseName, $entryType, $weightsJson, $pdfUrl]);
+        return (int) $this->db->lastInsertId();
+    }
+
     public function update(int $id, string $content, string $mediaUrl = ''): bool
     {
         $stmt = $this->db->prepare(
@@ -87,5 +113,18 @@ class PostDAO
     {
         $stmt = $this->db->prepare('DELETE FROM posts WHERE id = ?');
         return $stmt->execute([$id]);
+    }
+
+    public function getStudyGuides(): array 
+    {
+        $stmt = $this->db->prepare("
+            SELECT p.*, u.name AS author_name, u.avatar_url AS author_avatar
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.is_study_guide = 1
+            ORDER BY p.created_at DESC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

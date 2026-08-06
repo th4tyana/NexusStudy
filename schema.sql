@@ -137,3 +137,29 @@ INSERT INTO comments (post_id, user_id, content) VALUES
 (1, 3, 'Tenho interesse nas bolsas! Como posso me candidatar?'),
 (2, 1, 'Excelente trabalho, Gabriel! O portfolio esta muito bem estruturado.');
 
+ALTER TABLE posts 
+ADD COLUMN is_study_guide TINYINT(1) DEFAULT 0,
+ADD COLUMN study_topics TEXT NULL;
+ /* QL
+ALTER TABLE posts 
+ADD COLUMN course_name VARCHAR(255) NULL,
+ADD COLUMN entry_type VARCHAR(100) NULL,
+ADD COLUMN weights TEXT NULL,
+ADD COLUMN pdf_url VARCHAR(255) NULL,
+ADD COLUMN study_topics TEXT NULL;
+Caso esteja usando o MySQL 8.0.19 ou superior, pode usar a instrução IF NOT EXISTS para ignorar automaticamente as colunas que já existem:
+
+SQL
+ALTER TABLE posts 
+ADD COLUMN IF NOT EXISTS is_study_guide TINYINT(1) NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS course_name VARCHAR(255) NULL,
+ADD COLUMN IF NOT EXISTS entry_type VARCHAR(100) NULL,
+ADD COLUMN IF NOT EXISTS weights TEXT NULL,
+ADD COLUMN IF NOT EXISTS pdf_url VARCHAR(255) NULL,
+ADD COLUMN IF NOT EXISTS study_topics TEXT NULL;
+Verificar estrutura da tabela
+
+Para confirmar quais colunas foram adicionadas com sucesso, rode o comando:
+
+SQL
+DESCRIBE posts;

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 require_once __DIR__ . '/../models/DAO/UserDAO.php';
 require_once __DIR__ . '/../models/DAO/PostDAO.php';
 require_once __DIR__ . '/../models/DAO/LikeDAO.php';
@@ -52,9 +53,9 @@ class MainController
         if ($action === 'login')    { $this->authController->showAuth(); return; }
         if ($action === 'register') { $this->authController->showAuth(); return; }
 
-        if ($action === 'do_login')       { $this->authController->doLogin(); return; }
-        if ($action === 'do_register')    { $this->authController->doRegister(); return; }
-        if ($action === 'google_login')   { $this->authController->doGoogleLogin(); return; }
+        if ($action === 'do_login')        { $this->authController->doLogin(); return; }
+        if ($action === 'do_register')     { $this->authController->doRegister(); return; }
+        if ($action === 'google_login')    { $this->authController->doGoogleLogin(); return; }
         if ($action === 'google_callback') { $this->authController->doGoogleCallback(); return; }
 
         if ($action === 'institution_profile') { $this->profileController->showInstitutionProfile(); return; }
@@ -64,6 +65,7 @@ class MainController
 
         match ($action) {
             'feed'                => $this->postController->showFeed(),
+            'bolsas_guide'        => $this->postController->bolsasGuide(),
             'search_global'       => $this->searchController->searchGlobal(),
             'search'              => $this->searchController->searchGlobal(),
             'search_autocomplete' => $this->searchController->searchAutocomplete(),

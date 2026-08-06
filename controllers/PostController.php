@@ -15,6 +15,12 @@ class PostController
     ) {
     }
 
+    public function bolsasGuide(): void 
+    {
+        $guides = $this->postDAO->getStudyGuides();
+        require_once __DIR__ . '/../views/bolsasguide.php';
+    }
+
     public function showFeed(): void
     {
         $currentUserId = (int) ($_SESSION['user_id'] ?? 0);
@@ -117,14 +123,31 @@ class PostController
 
     public function postCreate(): void
     {
+        $userId     = (int)($_SESSION['user_id'] ?? 0);
         $content    = trim($_POST['content'] ?? '');
         $redirectTo = in_array($_POST['redirect_to'] ?? '', ['feed', 'profile'], true) ? $_POST['redirect_to'] : 'feed';
-        $mediaUrl   = $this->handleUpload('media_file');
+        $isGuide    = !empty($_POST['is_study_guide']);
 
-        if (!empty($content)) {
-            $this->postDAO->create((int)$_SESSION['user_id'], $content, $mediaUrl);
-            $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Publicação criada com sucesso!'];
+        if ($isGuide) {
+            $courseName = trim($_POST['course_name'] ?? '');
+            $entryType  = trim($_POST['entry_type'] ?? '');
+            $weights    = json_encode($_POST['weights'] ?? []);
+            $pdfUrl     = $this->handlePdfUpload('pdf_file');
+
+            if (!empty($content) && !empty($courseName)) {
+                $this->postDAO->createStudyGuide($userId, $content, $courseName, $entryType, $weights, $pdfUrl);
+                $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Guia de estudos publicado com sucesso!'];
+            } else {
+                $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Preencha todos os campos do guia.'];
+            }
+        } else {
+            $mediaUrl = $this->handleUpload('media_file');
+            if (!empty($content)) {
+                $this->postDAO->create($userId, $content, $mediaUrl);
+                $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Publicação criada com sucesso!'];
+            }
         }
+
         $this->mainController->redirect($redirectTo);
     }
 
@@ -138,6 +161,13 @@ class PostController
             $this->mainController->redirect('feed');
             return;
         }
+
+        $currentUserId = (int) ($_SESSION['user_id'] ?? 0);
+        $posts         = $this->hydratePostsWithComments($this->postDAO->getAll($currentUserId), $currentUserId);
+        $currentUser   = $this->mainController->getCurrentUserData($currentUserId);
+        $searchQuery   = '';
+        $searchResults = [];
+
         require __DIR__ . '/../views/feed_view.php';
     }
 
@@ -200,49 +230,57 @@ class PostController
 
     private function handleUpload(string $fieldName): string
     {
-        if (empty($_FILES[$fieldName]['name'])) {
+        if (empty($_FILES[$fieldName]['name']) || $_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
             return '';
         }
 
         $file = $_FILES[$fieldName];
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Falha no upload da imagem. Tente novamente.'];
+        $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
             return '';
         }
 
-        if ($file['size'] > self::MAX_UPLOAD_SIZE) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'A imagem deve ter no máximo 5MB.'];
-            return '';
+        if (!is_dir(self::UPLOAD_DIR)) {
+            mkdir(self::UPLOAD_DIR, 0755, true);
         }
 
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $ext = match ($extension) {
-            'jpg', 'jpeg' => 'jpg',
-            'png'         => 'png',
-            'gif'         => 'gif',
-            'webp'        => 'webp',
-            default       => '',
-        };
-
-        if ($ext === '') {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Somente imagens JPEG, PNG, GIF ou WEBP são permitidas.'];
-            return '';
-        }
-
-        if (!is_dir(self::UPLOAD_DIR) && !mkdir(self::UPLOAD_DIR, 0755, true) && !is_dir(self::UPLOAD_DIR)) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Não foi possível criar o diretório de upload.'];
-            return '';
-        }
-
-        $fileName = sprintf('%s.%s', bin2hex(random_bytes(16)), $ext);
+        $fileName    = sprintf('img_%s.%s', bin2hex(random_bytes(8)), $ext);
         $destination = self::UPLOAD_DIR . DIRECTORY_SEPARATOR . $fileName;
 
-        if (!move_uploaded_file($file['tmp_name'], $destination)) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Erro ao salvar a imagem enviada.'];
+        if (move_uploaded_file($file['tmp_name'], $destination)) {
+            return self::UPLOAD_URL . '/' . $fileName;
+        }
+
+        return '';
+    }
+
+    private function handlePdfUpload(string $fieldName): string
+    {
+        if (empty($_FILES[$fieldName]['name']) || $_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
             return '';
         }
 
-        return self::UPLOAD_URL . '/' . $fileName;
+        $file = $_FILES[$fieldName];
+        $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if ($ext !== 'pdf') {
+            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Apenas arquivos PDF são permitidos para o edital.'];
+            return '';
+        }
+
+        if (!is_dir(self::UPLOAD_DIR)) {
+            mkdir(self::UPLOAD_DIR, 0755, true);
+        }
+
+        $fileName    = sprintf('edital_%s.pdf', bin2hex(random_bytes(8)));
+        $destination = self::UPLOAD_DIR . DIRECTORY_SEPARATOR . $fileName;
+
+        if (move_uploaded_file($file['tmp_name'], $destination)) {
+            return self::UPLOAD_URL . '/' . $fileName;
+        }
+
+        return '';
     }
 
     private function canModifyPost(array $post): bool
