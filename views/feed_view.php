@@ -614,7 +614,7 @@
     <!-- Rodapé -->
     <p class="text-xs text-slate-400 text-center px-2">
       ALTI <?= date('Y') ?><br>
-      Projeto Acadêmico — Arquitetura MVC + PHP
+      2025 a 2026 Projeto Acadêmico Senai — Arquitetura MVC + PHP
     </p>
   </aside>
 
