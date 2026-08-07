@@ -15,6 +15,7 @@ O ALTI é uma plataforma de ecossistema educacional e profissional unificado, pr
 * **Portfólio & Perfis:** Visualização especializada para Estudantes (com contadores de progresso e seguidores) e Instituições de Ensino.
 * **Segurança Nativa:** Proteção estrita contra manipulação de requisições e filtros automáticos de moderação de comentários.
 * **Upload Unificado:** Gerenciamento centralizado de avatares de perfil e mídias para publicações.
+* **Bolsas & Editais:** Centralização de guias acadêmicos, upload institucional de PDFs e filtro interativo de cursos em tempo real.
 
 ---
 
