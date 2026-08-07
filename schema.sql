@@ -140,7 +140,7 @@ INSERT INTO comments (post_id, user_id, content) VALUES
 ALTER TABLE posts 
 ADD COLUMN is_study_guide TINYINT(1) DEFAULT 0,
 ADD COLUMN study_topics TEXT NULL;
- /* QL
+ 
 ALTER TABLE posts 
 ADD COLUMN course_name VARCHAR(255) NULL,
 ADD COLUMN entry_type VARCHAR(100) NULL,
