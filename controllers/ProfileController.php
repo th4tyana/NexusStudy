@@ -5,7 +5,6 @@ class ProfileController
 {
     private const UPLOAD_DIR = __DIR__ . '/../uploads';
     private const UPLOAD_URL = 'uploads';
-    private const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
 
     public function __construct(
         private UserDAO $userDAO,
@@ -128,51 +127,23 @@ class ProfileController
         $this->mainController->redirect('edit_profile');
     }
 
+    /** Upload de avatar: somente imagens, validadas por MIME real e content-sniffing. */
     private function handleUpload(string $fieldName): string
     {
-        if (empty($_FILES[$fieldName]['name'])) {
+        $file = $_FILES[$fieldName] ?? null;
+
+        if (!is_array($file) || (int)($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
             return '';
         }
 
-        $file = $_FILES[$fieldName];
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Falha no upload da imagem. Tente novamente.'];
+        $result = FileUploadValidator::storeUpload($file, FileUploadValidator::PROFILE_IMAGE, self::UPLOAD_DIR);
+
+        if (!$result['ok']) {
+            $_SESSION['flash'] = ['type' => 'error', 'msg' => $result['error']];
             return '';
         }
 
-        if ($file['size'] > self::MAX_UPLOAD_SIZE) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'A imagem deve ter no máximo 5MB.'];
-            return '';
-        }
-
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $ext = match ($extension) {
-            'jpg', 'jpeg' => 'jpg',
-            'png'         => 'png',
-            'gif'         => 'gif',
-            'webp'        => 'webp',
-            default       => '',
-        };
-
-        if ($ext === '') {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Somente imagens JPEG, PNG, GIF ou WEBP são permitidas.'];
-            return '';
-        }
-
-        if (!is_dir(self::UPLOAD_DIR) && !mkdir(self::UPLOAD_DIR, 0755, true) && !is_dir(self::UPLOAD_DIR)) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Não foi possível criar o diretório de upload.'];
-            return '';
-        }
-
-        $fileName = sprintf('%s.%s', bin2hex(random_bytes(16)), $ext);
-        $destination = self::UPLOAD_DIR . DIRECTORY_SEPARATOR . $fileName;
-
-        if (!move_uploaded_file($file['tmp_name'], $destination)) {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Erro ao salvar a imagem enviada.'];
-            return '';
-        }
-
-        return self::UPLOAD_URL . '/' . $fileName;
+        return self::UPLOAD_URL . '/' . $result['file_name'];
     }
 
     private function hydratePostsWithComments(array $posts, int $viewerId = 0): array

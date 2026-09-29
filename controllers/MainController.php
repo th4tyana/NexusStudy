@@ -6,6 +6,7 @@ require_once __DIR__ . '/../models/DAO/PostDAO.php';
 require_once __DIR__ . '/../models/DAO/LikeDAO.php';
 require_once __DIR__ . '/../models/DAO/CommentDAO.php';
 require_once __DIR__ . '/../models/DAO/FollowDAO.php';
+require_once __DIR__ . '/../services/FileUploadValidator.php';
 require_once __DIR__ . '/AuthController.php';
 require_once __DIR__ . '/PostController.php';
 require_once __DIR__ . '/ProfileController.php';

@@ -5,7 +5,6 @@ class PostController
 {
     private const UPLOAD_DIR = __DIR__ . '/../uploads';
     private const UPLOAD_URL = 'uploads';
-    private const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
 
     public function __construct(
         private PostDAO $postDAO,
@@ -132,10 +131,15 @@ class PostController
             $courseName = trim($_POST['course_name'] ?? '');
             $entryType  = trim($_POST['entry_type'] ?? '');
             $weights    = json_encode($_POST['weights'] ?? []);
-            $pdfUrl     = $this->handlePdfUpload('pdf_file');
+            $docUrl     = $this->handleDocumentUpload('pdf_file');
 
-            if (!empty($content) && !empty($courseName)) {
-                $this->postDAO->createStudyGuide($userId, $content, $courseName, $entryType, $weights, $pdfUrl);
+            if ($docUrl === '') {
+                // Arquivo rejeitado (ou ausente): NÃO cria o guia e preserva a mensagem de erro da validação.
+                if (empty($_SESSION['flash'])) {
+                    $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Anexe o documento do edital (PDF, DOCX ou XLSX).'];
+                }
+            } elseif (!empty($content) && !empty($courseName)) {
+                $this->postDAO->createStudyGuide($userId, $content, $courseName, $entryType, $weights, $docUrl);
                 $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Guia de estudos publicado com sucesso!'];
             } else {
                 $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Preencha todos os campos do guia.'];
@@ -173,16 +177,23 @@ class PostController
 
     public function postUpdate(): void
     {
-        $postId     = (int)($_POST['post_id'] ?? 0);
-        $content    = trim($_POST['content'] ?? '');
-        $existing   = trim($_POST['existing_media_url'] ?? '');
-        $post       = $this->postDAO->findById($postId);
-        $uploadUrl  = $this->handleUpload('media_file');
-        $mediaUrl   = $uploadUrl !== '' ? $uploadUrl : $existing;
+        $postId  = (int)($_POST['post_id'] ?? 0);
+        $content = trim($_POST['content'] ?? '');
+        $post    = $this->postDAO->findById($postId);
 
+        // Autorização ANTES de tocar no disco: quem não pode editar não grava arquivo nenhum.
         if (!$post || !$this->canModifyPost($post)) {
             $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Sem permissão.'];
-        } elseif (!empty($content)) {
+            $this->mainController->redirect('feed');
+            return;
+        }
+
+        // A mídia atual vem do banco, nunca do POST (evita apontar media_url para um arquivo não validado).
+        $existing  = (string)($post['media_url'] ?? '');
+        $uploadUrl = $this->handleUpload('media_file');
+        $mediaUrl  = $uploadUrl !== '' ? $uploadUrl : $existing;
+
+        if (!empty($content)) {
             $this->postDAO->update($postId, $content, $mediaUrl);
             $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Publicação atualizada.'];
         }
@@ -228,59 +239,40 @@ class PostController
         $this->mainController->redirect('feed');
     }
 
+    /** Upload de imagem (mídia de publicação). */
     private function handleUpload(string $fieldName): string
     {
-        if (empty($_FILES[$fieldName]['name']) || $_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
-            return '';
-        }
-
-        $file = $_FILES[$fieldName];
-        $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
-            return '';
-        }
-
-        if (!is_dir(self::UPLOAD_DIR)) {
-            mkdir(self::UPLOAD_DIR, 0755, true);
-        }
-
-        $fileName    = sprintf('img_%s.%s', bin2hex(random_bytes(8)), $ext);
-        $destination = self::UPLOAD_DIR . DIRECTORY_SEPARATOR . $fileName;
-
-        if (move_uploaded_file($file['tmp_name'], $destination)) {
-            return self::UPLOAD_URL . '/' . $fileName;
-        }
-
-        return '';
+        return $this->processUpload($fieldName, FileUploadValidator::PROFILE_IMAGE, 'img_');
     }
 
-    private function handlePdfUpload(string $fieldName): string
+    /** Upload de documento do edital/guia: PDF, DOCX ou XLSX (Google Docs/Sheets exportados). */
+    private function handleDocumentUpload(string $fieldName): string
     {
-        if (empty($_FILES[$fieldName]['name']) || $_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
+        return $this->processUpload($fieldName, FileUploadValidator::PROFILE_DOCUMENT, 'edital_');
+    }
+
+    /**
+     * Ponto único de upload do controller. Toda a validação (extensão, MIME real,
+     * content-sniffing, conteúdo ativo, tamanho) fica em FileUploadValidator.
+     * Retorna a URL pública do arquivo salvo ou '' (com flash de erro, se aplicável).
+     */
+    private function processUpload(string $fieldName, string $profile, string $prefix): string
+    {
+        $file = $_FILES[$fieldName] ?? null;
+
+        // Nenhum arquivo enviado: não é erro (campo opcional).
+        if (!is_array($file) || (int)($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
             return '';
         }
 
-        $file = $_FILES[$fieldName];
-        $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $result = FileUploadValidator::storeUpload($file, $profile, self::UPLOAD_DIR, $prefix);
 
-        if ($ext !== 'pdf') {
-            $_SESSION['flash'] = ['type' => 'error', 'msg' => 'Apenas arquivos PDF são permitidos para o edital.'];
+        if (!$result['ok']) {
+            $_SESSION['flash'] = ['type' => 'error', 'msg' => $result['error']];
             return '';
         }
 
-        if (!is_dir(self::UPLOAD_DIR)) {
-            mkdir(self::UPLOAD_DIR, 0755, true);
-        }
-
-        $fileName    = sprintf('edital_%s.pdf', bin2hex(random_bytes(8)));
-        $destination = self::UPLOAD_DIR . DIRECTORY_SEPARATOR . $fileName;
-
-        if (move_uploaded_file($file['tmp_name'], $destination)) {
-            return self::UPLOAD_URL . '/' . $fileName;
-        }
-
-        return '';
+        return self::UPLOAD_URL . '/' . $result['file_name'];
     }
 
     private function canModifyPost(array $post): bool
