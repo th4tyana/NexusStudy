@@ -1,0 +1,29 @@
+# Hardening da pasta de uploads (Apache 2.4) — defesa em profundidade.
+# Mesmo que um arquivo malicioso chegue ao disco, ele não é executado nem "farejado" pelo navegador.
+
+# 1. Nunca executar scripts nesta pasta
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+Options -Indexes -ExecCGI -Includes
+
+# 2. Somente extensões da allowlist podem ser servidas
+<FilesMatch "^(?!.*\.(jpg|png|gif|webp|pdf|docx|xlsx)$).*$">
+    Require all denied
+</FilesMatch>
+
+# 3. Proibir Content-Sniffing (MIME é o declarado pelo servidor) e forçar download de documentos Office
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    <FilesMatch "\.(docx|xlsx)$">
+        Header set Content-Disposition "attachment"
+    </FilesMatch>
+</IfModule>
